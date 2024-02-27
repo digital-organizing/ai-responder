@@ -1,0 +1,19 @@
+{% for field in bot.field_set.all %}
+{% if field.choices %}
+<p>
+  <label>{{field.name}}</label>
+  <select name="{{field.slug}}">
+    {% for choice in field.iter_choices %}
+    <option value="{{choice}}">{{choice}}</option>
+    {% endfor %}
+  </select>
+</p>
+
+{% else %}
+<p>
+  <label>{{field.name}}</label>
+  <input type="text" name="{{field.slug}}" />
+</p>
+{% endif %}
+{% endfor %}
+{% csrf_token %}

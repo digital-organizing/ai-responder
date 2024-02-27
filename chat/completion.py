@@ -1,0 +1,108 @@
+from typing import List
+
+import openai
+from django.conf import settings
+
+from chat.models import ChatBot, Message, Thread
+from context.models import Document
+
+
+def format_doc(doc: Document):
+    return f"[{doc.content}]\n({doc.page.url})\n"
+
+
+def get_system_prompt(question, bot, docs, **kwargs):
+    system_prompt = bot.system_prompt_template.format(
+        context="\n".join([format_doc(doc) for doc in docs]),
+        question=question,
+        **kwargs,
+    )
+    return system_prompt
+
+
+def get_user_prompt(question, bot, docs, **kwargs):
+    user_prompt = bot.user_prompt_template.format(question=question, **kwargs)
+    return user_prompt
+
+
+def get_messages(question, bot, docs, **kwargs):
+    system_prompt = get_system_prompt(question, bot, docs, **kwargs)
+    user_prompt = get_user_prompt(question, bot, docs, **kwargs)
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
+    return messages
+
+
+def get_completion(messages, bot, **kwargs):
+    client = openai.Client(api_key=settings.OPENAI_KEY)
+    completion = client.chat.completions.create(
+        messages=messages,
+        model=bot.model,
+        **kwargs,
+    )
+    return completion
+
+
+def generate_answer(question: str, bot: ChatBot, docs: List[Document], **kwargs):
+    messages = get_messages(question, bot, docs, **kwargs)
+
+    return get_completion(messages, bot)
+
+
+def query_tool():
+    return {
+        "type": "function",
+        "function": {
+            "name": "search",
+            "description": (
+                "Query semantic knowledge base with context for a question"
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "search queries",
+                    },
+                },
+                "required": ["query"],
+            },
+        },
+    }
+
+
+def init_thread(bot: ChatBot, question: str, docs, **kwargs):
+    messages = get_messages(bot, question, docs, **kwargs)
+    thread = Thread.objects.create(bot=bot)
+
+    thread.message_set.create(
+        content=messages[0]["content"],
+        role="system",
+    )
+
+    thread.message_set.create(content=question, role="user")
+
+    completion = get_completion(messages, bot)
+
+    answer = completion.choices[0].message.content
+
+    Message.objects.bulk_create(
+        [
+            Message(content=messages[0]["content"], role="system", thread=thread),
+            Message(content=question, role="user", thread=thread),
+            Message(content=answer, role="assistant", thread=thread),
+        ]
+    )
+
+
+def threaded_answer(thread: Thread, user_input):
+    thread.message_set.create(content=user_input, role="user")
+    messages = thread.messages()
+
+    completion = get_completion(messages, thread.bot, tools=[query_tool()])
+
+    # TODO: If tool => Query, append and recall (without tool)
+    # else => add message, return to user

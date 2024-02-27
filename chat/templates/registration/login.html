@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if form.errors %}
+<p>Falsches Passwort, bitte erneut versuchen.</p>
+{% endif %}
+<h2>Anmelden</h2>
+
+<form method="post" action="{% url 'login' %}">
+  {% csrf_token %}
+  {{form}}
+  <p>
+  <button type="submit">Anmelden</button>
+  </p>
+</form>
+{% endblock %}

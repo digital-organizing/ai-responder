@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{request.LANGUAGE}}" color-mode="user">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }} | AI Toolbox</title>
+  <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+  <link href="{% static 'style.css' %}" rel="stylesheet">
+</head>
+
+<body>
+  <header>
+    <nav>
+      <ul>
+        <li>
+      <a href="/">Start</a>
+      </li>
+        <li>
+      <a href="/context/">Suche</a>
+      </li>
+      <li>
+      <a href="#">Threads</a>
+      </li>
+      </ul>
+
+    </nav>
+    <p>Chatbot Prototyp</p>
+    {% block header %}
+    {% endblock %}
+  </header>
+
+  <main>
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <footer>
+    <nav>
+    <a href="mailto:sandro@digitalorganizing.ch">Support</a>
+    <a href="/admin/">Administration</a>
+    </nav>
+    {% block footer %}
+    {% endblock %}
+  </footer>
+  <script src="{% static 'utils.js' %}"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
+    integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+  {% block scripts %}
+  {% endblock %}
+
+</body>
+
+</html>

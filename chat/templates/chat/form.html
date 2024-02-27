@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<p>
+<label for="bot">Chatbot-Konfiguration</label>
+<select name="bot" id="bot-select">
+  {% for group in groups %}
+  <optgroup label="{{group.name}}">
+    {% for bot in group.chatbot_set.all %}
+    <option value="{{bot.slug}}">{{bot.name}}</option>
+    {% endfor %}
+  </optgroup>
+  {% endfor %}
+</select>
+</p>
+
+<form id="bot-form">
+  <div id="bot-fields">
+  </div>
+  <p>
+    <label>Frage</label>
+    <textarea required="true" name="question"></textarea>
+  </p>
+  <button type="submit">
+    Absenden
+  </button>
+</form>
+
+<article>
+  <div class="spinner hidden" id="spinner">
+    <div class="rect1"></div>
+    <div class="rect2"></div>
+    <div class="rect3"></div>
+    <div class="rect4"></div>
+    <div class="rect5"></div>
+  </div>
+  <textarea readonly="true" id="answer-field"></textarea>
+  <div id="sources"></div>
+</article>
+
+{% endblock %}
+
+{% block scripts %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="{% static 'form_script.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,102 @@
+[project]
+name = "ai-mails"
+version = "0.0.1"
+dependencies = [
+  "BeautifulSoup4",
+  "boto3",
+  "cachetools",
+  "celery[redis]",
+  "django",
+  "django-bootstrap5",
+  "django-celery-beat",
+  "django-celery-results",
+  "django-cors-headers",
+  "django-environ",
+  "django-baton",
+  "django-import-export",
+  "django-json-widget",
+  "django-model-utils",
+  "django-sesame[ua]",
+  "django-storages",
+  "djangorestframework",
+  "document-embedding",
+  "exceptiongroup",
+  "fairseq",
+  "gunicorn",
+  "laser_encoders",
+  "lxml",
+  "markdown",
+  "more-itertools",
+  "numba",
+  "numpy",
+  "openai",
+  "openpyxl",
+  "pandas",
+  "psutil",
+  "psycopg2-binary",
+  "pymemcache",
+  "pymilvus",
+  "ratelimit",
+  "redis",
+  "requests",
+  "selenium",
+  "sentry-sdk",
+  "tablib",
+  "tika",
+  "uvicorn[standard]",
+  "w3lib",
+  "qdrant-client",
+  "whitenoise[brotli]",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = []
+
+[project.optional-dependencies]
+dev = ["isort", "pytest", "rope", "toml", "yapf", "django-types"]
+
+
+[tool.pylsp-mypy]
+enabled = true
+live_mode = false
+strict = true
+dmypy = true
+
+
+[tool.pyright]
+
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+python_version = "3.10"
+check_untyped_defs = true
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+
+
+[tool.flake8]
+max-line-length = 120
+exclude = ".tox,.git,*/migrations/*,*/static/CACHE/*,docs,node_modules,venv"
+
+[tool.yapf]
+based_on_style = "google"
+column_limit = 120
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+
+
+[tool.pycodestyle]
+max-line-length = 120
+exclude = ".tox,.git,*/migrations/*,*/static/CACHE/*,docs,node_modules,venv"
+
+
+[tool.ruff]
+line-length = 120

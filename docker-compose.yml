@@ -1,0 +1,93 @@
+version: "3.7"
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/home/app/web/
+      - model_cache:/home/app/.cache/
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env
+    environment:
+      - DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$SQL_HOST/$POSTGRES_DB
+
+  celery-beat:
+    build: .
+    command: celery -A core beat --loglevel DEBUG --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    env_file:
+      - ./.env
+    volumes:
+      - .:/home/app/web/
+      - model_cache:/home/app/web/.cache/
+    environment:
+      - DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$SQL_HOST/$POSTGRES_DB
+
+  celery:
+    build: .
+    command: celery -A core worker --loglevel DEBUG --concurrency 4
+    env_file:
+      - ./.env
+    volumes:
+      - .:/home/app/web/
+      - model_cache:/home/app/web/.cache/
+    environment:
+      - DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$SQL_HOST/$POSTGRES_DB
+
+  redis:
+    image: redis:alpine
+
+  cache:
+    image: memcached:alpine
+
+
+  db:
+    image: postgres:14.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+
+  qdrant:
+    image: qdrant/qdrant:v1.6.1
+    ports:
+      - 6333:6333
+      - 6334:6334
+    expose:
+      - 6333
+      - 6334
+      - 6335
+    volumes:
+      - qdrant_data:/qdrant_data
+
+  chrome:
+    image: selenium/node-chrome:4.16.1-20231219
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=8
+      - START_XVFB=false
+
+  selenium-hub:
+    image: selenium/hub:4.16.1-20231219
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+
+  tika:
+    image: apache/tika
+
+volumes:
+  static:
+  media:
+  postgres_data:
+  qdrant_data:
+  model_cache:
+

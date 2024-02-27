@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<form id="search-form">
+  <p>
+  <label for="collection-select">Textsammlung</label>
+  <select name="collection" id="collection-select">
+    {% for group in groups %}
+    <optgroup label="{{group.name}}">
+      {% for bot in group.collection_set.all %}
+      <option value="{{bot.pk}}">{{bot.pk}}</option>
+      {% endfor %}
+    </optgroup>
+    {% endfor %}
+  </select>
+  </p>
+
+  <p>
+  <label>Suche</label>
+  <textarea name="question" ></textarea>
+  </p>
+  <p>
+  <label>Anzahl Resultate</label>
+  <input type="number" name="n" value="5" />
+  </p>
+  <button type="submit">Suche</button>
+</form>
+
+<article>
+  <div class="spinner hidden" id="spinner">
+    <div class="rect1"></div>
+    <div class="rect2"></div>
+    <div class="rect3"></div>
+    <div class="rect4"></div>
+    <div class="rect5"></div>
+  </div>
+  <div id="sources"></div>
+</article>
+
+{% endblock %}
+
+{% block scripts %}
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script src="{% static 'search.js' %}"></script>
+{% endblock %}
