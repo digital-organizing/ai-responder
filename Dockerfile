@@ -33,7 +33,7 @@ RUN chown -R app:app /static ${APP_HOME}
 # change to the app user
 USER app
 
-RUN SKIP_MILVUS=true python manage.py compilemessages && SKIP_MILVUS=true python manage.py collectstatic --noinput
+RUN python manage.py collectstatic --noinput
 
 ENTRYPOINT ["/home/app/web/entrypoint.sh"]
 
