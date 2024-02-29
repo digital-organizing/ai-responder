@@ -7,6 +7,7 @@ from urllib.parse import ParseResult
 import requests
 from bs4 import BeautifulSoup
 from django.conf import settings
+from django.db.models import Q
 from django.utils import timezone
 from selenium import webdriver
 from tika import parser
@@ -31,6 +32,13 @@ def get_next_url(config: CrawlConfig):
     )
     for url in config.excludes():
         q = q.exclude(url__startswith=url)
+
+    f = Q()
+
+    for include in config.includes():
+        f = f | Q(url__startswith=include)
+
+    q = q.filter(f)
 
     return q.first()
 

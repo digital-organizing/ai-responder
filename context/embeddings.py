@@ -4,6 +4,7 @@ from typing import List
 import numpy as np
 import openai
 from django.conf import settings
+from django.db.models import QuerySet
 from laser_encoders import LaserEncoderPipeline
 from qdrant_client import QdrantClient, models
 
@@ -63,6 +64,10 @@ def names(response):
     return [collection.name for collection in response.collections]
 
 
+def collection_exists(qdrant, slug):
+    return slug in names(qdrant.get_collections())
+
+
 def _batch_insert(collection, query, encoder, use_openai):
     records = list(query)
     print(f"Creating embeddings for {len(records)} texts")
@@ -75,7 +80,7 @@ def _batch_insert(collection, query, encoder, use_openai):
     embedding_dim = embeddings.shape[-1]
 
     with qdrant_client() as qdrant:
-        if collection.slug not in names(qdrant.get_collections()):
+        if not collection_exists(qdrant, collection.slug):
             qdrant.create_collection(
                 collection.slug,
                 models.VectorParams(
@@ -104,3 +109,28 @@ def index_documents(collection: Collection):
         _batch_insert(collection, batch, encoder, collection.use_openai)
 
     query.update(is_indexed=True)
+
+
+def reindex_documents(collection: Collection):
+    with qdrant_client() as qdrant:
+        if collection_exists(qdrant, collection.slug):
+            qdrant.delete_collection(collection.slug)
+
+    Document.objects.filter(collection=collection).update(is_indexed=False)
+    index_documents(collection)
+
+
+def delete_documents(queryset: QuerySet[Document]):
+    indexed = queryset.filter(is_indexed=True)
+    pks = list(indexed.values_list("pk", flat=True))
+    collection = indexed[0].collection
+
+    with qdrant_client() as client:
+        client.delete(
+            collection_name=collection.slug,
+            points_selector=models.PointIdsList(
+                points=pks,
+            ),
+        )
+
+    queryset.delete()

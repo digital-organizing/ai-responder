@@ -16,11 +16,18 @@ class CrawlConfig(models.Model):
     group = models.ForeignKey("auth.Group", models.CASCADE)
 
     exclude_paths = models.TextField(blank=True)
+    include_paths = models.TextField(blank=True)
 
     arguments = models.TextField(blank=True)
 
     def excludes(self):
-        return [line.strip() for line in self.exclude_paths.split("\n")]
+        return [line.strip() for line in self.exclude_paths.split("\n") if line.strip()]
+
+    def has_includes(self):
+        return self.include_paths != ""
+
+    def includes(self):
+        return [line.strip() for line in self.include_paths.split("\n")]
 
     def domains(self):
         return [domain.strip() for domain in self.allowed_domains.split()]

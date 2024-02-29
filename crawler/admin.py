@@ -6,11 +6,19 @@ from django.http import HttpRequest
 
 from crawler.crawling import crawl_page
 from crawler.models import CrawlConfig, Page
+from crawler.tasks import run_crawler
 
 
 @admin.register(CrawlConfig)
 class CrawlConfigAdmin(admin.ModelAdmin):
     list_display = ["start_url", "last_fetched"]
+
+    actions = ["run_crawler_action"]
+
+    @admin.action(description="start crawler")
+    def run_crawler_action(self, request, queryset):
+        for config in queryset:
+            run_crawler.delay(pk=config.pk)
 
     def get_queryset(self, request: Any) -> QuerySet[Any]:
         if request.user.is_superuser:
