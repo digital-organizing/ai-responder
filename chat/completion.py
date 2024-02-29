@@ -86,8 +86,7 @@ def init_thread(bot: ChatBot, question: str, docs, **kwargs):
     thread.message_set.create(content=question, role="user")
 
     completion = get_completion(messages, bot)
-
-    answer = completion.choices[0].message.content
+    answer = completion.choices[0].message.content.replace("ß", "ss")
 
     Message.objects.bulk_create(
         [

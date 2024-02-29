@@ -29,7 +29,10 @@ def answer_view(request: HttpRequest, slug):
     serializer = DocumentSerializer(docs, many=True)
 
     return JsonResponse(
-        {"answer": answer.choices[0].message.content, "docs": serializer.data}
+        {
+            "answer": answer.choices[0].message.content.replace("ß", "ss"),
+            "docs": serializer.data,
+        }
     )
 
 
