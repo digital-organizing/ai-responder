@@ -3,6 +3,7 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
 from chat.completion import generate_answer
 from chat.models import ChatBot
@@ -14,6 +15,7 @@ def index_view(request: HttpRequest):
     return render(request, "index.html")
 
 
+@csrf_exempt
 def answer_view(request: HttpRequest, slug):
     data = request.POST.dict()
     q = str(data.pop("question"))
