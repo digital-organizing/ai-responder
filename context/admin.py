@@ -31,6 +31,8 @@ class DocumentAdmin(admin.ModelAdmin):
 
     actions = ["delete_documents_action"]
 
+    autocomplete_fields = ["page"]
+
     @admin.action(description="Delete Documents")
     def delete_documents_action(self, request, queryset):
         delete_documents(queryset)
