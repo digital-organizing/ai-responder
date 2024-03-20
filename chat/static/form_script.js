@@ -32,10 +32,9 @@ $(document).ready(function () {
           .join("\n");
       })
       .catch(() =>
-        alert("Fehler bei der Bearbeitung der Frage, erneut versuchen!"),
+        alert("Fehler bei der Bearbeitung der Frage, erneut versuchen!")
       )
       .finally(() => spinner.classList.add("hidden"));
   });
   loadSlug();
-  $("#answer-field").on("click", (e) => e.target.select());
 });
