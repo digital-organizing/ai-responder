@@ -7,8 +7,6 @@ services:
     volumes:
       - .:/home/app/web/
       - model_cache:/home/app/.cache/
-    ports:
-      - 8000:8000
     env_file:
       - ./.env
     environment:
@@ -41,7 +39,6 @@ services:
 
   cache:
     image: memcached:alpine
-
 
   db:
     image: postgres:14.0-alpine
@@ -90,4 +87,5 @@ volumes:
   postgres_data:
   qdrant_data:
   model_cache:
+
 
