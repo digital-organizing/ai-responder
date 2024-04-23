@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from langdetect import detect
 
 from chat.completion import generate_answer
 from chat.models import ChatBot
@@ -52,3 +53,13 @@ def field_view(request, slug):
     return render(
         request, "chat/bot_form.html", {"bot": ChatBot.objects.get(slug=slug)}
     )
+
+
+@csrf_exempt
+def determine_language(request):
+    data = request.POST.dict()
+    q = str(data.pop("question"))
+    
+    return JsonResponse({
+        'lang': detect(q)
+    })
