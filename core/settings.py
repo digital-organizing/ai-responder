@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = env("SECRET_KEY", default="secret")
 
-DEBUG = env("DEBUG", default=False)
+DEBUG = env("DEBUG", default=True)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
 
@@ -46,8 +46,8 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
     "whitenoise.runserver_nostatic",
+    "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework.authtoken",
     "context",
