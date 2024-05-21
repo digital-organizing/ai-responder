@@ -19,7 +19,7 @@ def index_view(request: HttpRequest):
 @csrf_exempt
 def answer_view(request: HttpRequest, slug):
     data = request.POST.dict()
-    q = str(data.pop("question"))[:10_000]
+    q = str(data.pop("question"))[-10_000:]
 
     bot = ChatBot.objects.get(slug=slug)
     docs = []
