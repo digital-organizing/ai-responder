@@ -41,6 +41,15 @@ def generate_embeddings_openai(texts: List[str]):
     return np.array(results)
 
 
+def get_embedding(document: Document):
+    if document.collection.use_openai:
+        return generate_embeddings_openai([document.content])
+
+    return generate_embeddings(
+        [document.content], load_encoder(document.collection.language)
+    )
+
+
 def batch_qs(qs, batch_size=1000):
     """
     Returns a (start, end, total, queryset) tuple for each batch in the given
@@ -98,17 +107,38 @@ def _batch_insert(collection, query, encoder, use_openai):
 
 
 def index_documents(collection: Collection):
+
+    query = Document.objects.filter(collection=collection).filter(is_indexed=False)
+
+    update_documents(query, collection)
+
+
+def insert_document(doc: Document):
+    with qdrant_client() as client:
+        client.upsert(
+            doc.collection.slug,
+            [models.PointStruct(id=doc.pk, vector=get_embedding(doc))],
+        )
+
+
+def update_document(doc: Document):
+    with qdrant_client() as client:
+        client.update_vectors(
+            doc.collection.slug,
+            [models.PointVectors(id=doc.pk, vector=get_embedding(doc))],
+        )
+
+
+def update_documents(docs: QuerySet[Document], collection: Collection):
     if not collection.use_openai:
         encoder = load_encoder(collection.language)
     else:
         encoder = None
 
-    query = Document.objects.filter(collection=collection).filter(is_indexed=False)
-
-    for batch in batch_qs(query.values_list("pk", "content").order_by("pk")):
+    for batch in batch_qs(docs.values_list("pk", "content").order_by("pk")):
         _batch_insert(collection, batch, encoder, collection.use_openai)
 
-    query.update(is_indexed=True)
+    docs.update(is_indexed=True)
 
 
 def reindex_documents(collection: Collection):
@@ -116,6 +146,7 @@ def reindex_documents(collection: Collection):
         if collection_exists(qdrant, collection.slug):
             qdrant.delete_collection(collection.slug)
 
+    Document.objects.filter(collection=collection, stale=True).delete()
     Document.objects.filter(collection=collection).update(is_indexed=False)
     index_documents(collection)
 

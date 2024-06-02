@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 
@@ -15,6 +16,15 @@ class Collection(models.Model):
         return self.slug
 
 
+def get_upload_name(obj: "File", name: str):
+    return f"{obj.collection.slug}/{name}"
+
+
+class File(models.Model):
+    content = models.FileField(upload_to=get_upload_name)
+    collection = models.ForeignKey(Collection, models.CASCADE)
+
+
 class Document(models.Model):
     content = models.TextField(blank=True)
     title = models.TextField(blank=True)
@@ -27,8 +37,14 @@ class Document(models.Model):
 
     collection = models.ForeignKey(Collection, models.CASCADE)
 
-    page = models.ForeignKey("crawler.Page", models.CASCADE)
+    page = models.ForeignKey("crawler.Page", models.CASCADE, blank=True, null=True)
     content_hash = models.CharField(max_length=60, blank=True)
+
+    file = models.ForeignKey(File, models.CASCADE, blank=True, null=True)
 
     def __str__(self) -> str:
         return super().__str__()
+
+
+class DocumentMeta(models.Model):
+    date = models.DateTimeField(default=timezone.now)
