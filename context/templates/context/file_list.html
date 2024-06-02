@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<a class="button" href="{% url 'context:manage-collection' collection.slug %}">Zurück</a>
+<h2>Datei hochladen</h2>
+<div class="upload">
+    <form method="post" enctype="multipart/form-data" action="{% url 'context:upload-file' collection.slug %}">
+        <input type="text" name="name" />
+        <input type="file" name="content" />
+        {% csrf_token %}
+        <button type="submit">Hochladen</button>
+    </form>
+    </form>
+</div>
+<table>
+    <thead>
+        <tr>
+            <th>
+                Dateiname
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for file in files %}
+        <tr>
+            <td>
+                {{file.content.name}}
+            </td>
+            <td>
+                <form method="post" action="{% url 'context:delete-file' collection.slug %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="pk" value="{{file.pk}}">
+                    <button type="submit">Löschen</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock content %}

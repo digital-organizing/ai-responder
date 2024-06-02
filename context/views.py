@@ -34,7 +34,7 @@ def _check_access(slug: str, user: User):
 def query_context(request):
     q = request.GET.get("question")
     slug = request.GET.get("collection")
-    limit = int(request.GET.get("limit", 5))
+    limit = int(request.GET.get("n", 5))
     results = search(slug, q, limit)
     docs = get_documents(results)
 
@@ -52,12 +52,31 @@ def search_view(request):
 
 
 @login_required
+def manage_collection(request, slug):
+    collection = _check_access(slug, request.user)
+
+    return render(
+        request,
+        "context/manage_collection.html",
+        {"collection": collection, "title": collection.slug},
+    )
+
+
+@login_required
 def list_files(request, slug):
     collection = _check_access(slug, request.user)
 
     files = File.objects.filter(collection=collection)
 
-    return render(request, "context/file_list.html", {"files": files})
+    return render(
+        request,
+        "context/file_list.html",
+        {
+            "files": files,
+            "collection": collection,
+            "title": f"Dateien: {collection.slug}",
+        },
+    )
 
 
 @login_required
@@ -72,7 +91,7 @@ def delete_file(request, slug):
 
     f.delete()
 
-    return redirect(list_files, args=(slug,))
+    return redirect("context:file-list", slug=slug)
 
 
 @login_required
@@ -88,12 +107,14 @@ def upload_file(request, slug):
 
     text = parsed["content"]
     doc = BeautifulSoup(text, "lxml")
-    pages = doc.find_all("div", {"class": "page"})
+    if f.content.name.endswith(".pdf"):
+        pages = doc.find_all("div", {"class": "page"})
+        paragraphs = [p.get_text() for p in pages]
+    else:
+        paragraphs = [p.get_text() for p in doc.find_all("p")]
 
-    paragraphs = ""
-    for page in pages:
-        paragraphs += "<p>" + page.get_text().replace("\n\n", "<br/>)") + "</p>"
-    title = doc.find("title")
+    paragraphs = list(filter(lambda x: len(x.strip()) > 100, paragraphs))
+    title = request.POST["name"]
 
     documents = [
         Document(
@@ -111,7 +132,7 @@ def upload_file(request, slug):
 
     update_documents(f.document_set.all(), collection)
 
-    return redirect(list_files, args=(slug,))
+    return redirect("context:file-list", slug=slug)
 
 
 @login_required
@@ -121,7 +142,11 @@ def list_documents(request, slug):
     return render(
         request,
         "context/document_list.html",
-        {"documents": collection.document_set.filter(page__isnull=True)},
+        {
+            "documents": collection.document_set.filter(page__isnull=True),
+            "collection": collection,
+            "title": f"Dokumente: {collection.slug}",
+        },
     )
 
 
@@ -138,18 +163,22 @@ def create_document(request, slug):
     content = request.POST["content"]
 
     hash = get_hash(content)
-    doc = Document.objects.create(
-        content=content,
-        title=request.POST["title"],
-        is_indexed=False,
-        fetched_at=request.POST["date"],
+    doc, created = Document.objects.update_or_create(
         content_hash=hash,
         collection=collection,
+        defaults=dict(
+            content=content,
+            title=request.POST["title"],
+            is_indexed=False,
+            fetched_at=request.POST["date"],
+            number=0,
+        ),
     )
 
-    insert_document(doc)
+    if created:
+        insert_document(doc)
 
-    return redirect(list_documents, args=(slug,))
+    return redirect("context:document-list", slug=slug)
 
 
 @login_required
@@ -161,7 +190,7 @@ def update_document(request, slug, pk):
         return render(
             request,
             "context/update_document.html",
-            {"doc": doc, "collection": collection},
+            {"document": doc, "collection": collection, "title": "Dokument bearbeiten"},
         )
 
     doc.content = request.POST["content"]
@@ -171,14 +200,15 @@ def update_document(request, slug, pk):
 
     update_document_qd(doc)
 
-    return redirect(list_documents, args=(slug,))
+    return redirect("context:document-list", slug=slug)
 
 
 @login_required
-def delete_document(request, slug, pk):
+def delete_document(request, slug):
     collection = _check_access(slug, request.user)
+    pk = request.POST["pk"]
 
     delete_documents(collection.document_set.filter(pk=pk))
     collection.document_set.filter(pk=pk).delete()
 
-    return redirect(list_documents, args=(slug,))
+    return redirect("context:document-list", slug=slug)

@@ -61,3 +61,18 @@ def determine_language(request):
     q = str(data.pop("question"))
 
     return JsonResponse({"lang": detect(q)})
+
+
+@login_required
+def manage_view(request):
+    groups = request.user.groups.all()
+    return render(request, "manage.html", {"groups": groups, "title": "Manage"})
+
+
+@login_required
+def manage_chatbot(request, slug):
+    bot = ChatBot.objects.get(slug=slug)
+    if not bot.group in request.user.groups.all():
+        raise PermissionError("You are not allowed to manage this bot")
+
+    return render(request, "chat/manage_bot.html", {"bot": bot})

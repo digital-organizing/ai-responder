@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <a class="button" href="/manage/">Zurück</a>
+  <h2>Verwaltung: {{ collection.slug }}</h2>
+
+  <div class="buttons">
+    <a class="button" href="{% url 'context:document-list' collection.slug %}">Dokumente</a>
+    <a class="button" href="{% url 'context:file-list' collection.slug %}">Dateien</a>
+  </div>
+{% endblock %}

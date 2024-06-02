@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Manage Chatbots and Contexts</h1>
+
+  {% for group in groups %}
+    <h2>{{ group.name }}</h2>
+    <h3>Chatbots</h3>
+    <ul>
+      {% for bot in group.chatbot_set.all %}
+        <li>{{ bot.name }}</li>
+      {% endfor %}
+    </ul>
+    <h3>Sammlungen</h3>
+    <ul>
+      {% for context in group.collection_set.all %}
+        <li>
+          <a href="{% url 'context:manage-collection' context.slug %}">{{ context.slug }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endfor %}
+{% endblock %}

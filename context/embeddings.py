@@ -1,12 +1,14 @@
 from contextlib import contextmanager
-from typing import List
+from typing import List, TYPE_CHECKING
 
 import numpy as np
 import openai
 from django.conf import settings
 from django.db.models import QuerySet
-from laser_encoders import LaserEncoderPipeline
 from qdrant_client import QdrantClient, models
+
+if TYPE_CHECKING:
+    from laser_encoders import LaserEncoderPipeline
 
 from context.models import Collection, Document
 
@@ -22,6 +24,8 @@ def qdrant_client():
 
 
 def load_encoder(language):
+    from laser_encoders import LaserEncoderPipeline
+
     encoder = LaserEncoderPipeline(language)
     return encoder
 
@@ -29,7 +33,7 @@ def load_encoder(language):
 EMBEDDING_DIMENSION = 1024
 
 
-def generate_embeddings(texts: List[str], encoder: LaserEncoderPipeline):
+def generate_embeddings(texts: List[str], encoder):
     return np.array(encoder.encode_sentences(texts, normalize_embeddings=True))
 
 
@@ -117,7 +121,7 @@ def insert_document(doc: Document):
     with qdrant_client() as client:
         client.upsert(
             doc.collection.slug,
-            [models.PointStruct(id=doc.pk, vector=get_embedding(doc))],
+            [models.PointStruct(id=doc.pk, vector=get_embedding(doc)[0])],
         )
 
 
@@ -125,7 +129,7 @@ def update_document(doc: Document):
     with qdrant_client() as client:
         client.update_vectors(
             doc.collection.slug,
-            [models.PointVectors(id=doc.pk, vector=get_embedding(doc))],
+            [models.PointVectors(id=doc.pk, vector=get_embedding(doc)[0])],
         )
 
 
@@ -153,6 +157,8 @@ def reindex_documents(collection: Collection):
 
 def delete_documents(queryset: QuerySet[Document]):
     indexed = queryset.filter(is_indexed=True)
+    if not indexed.exists():
+        return
     pks = list(indexed.values_list("pk", flat=True))
     collection = indexed[0].collection
 

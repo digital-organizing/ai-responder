@@ -24,6 +24,7 @@ def get_documents(result):
     scores = [r.score for r in result]
     docs = list(Document.objects.filter(pk__in=pks).prefetch_related("page"))
 
-    docs = [x for _, x in sorted(zip(scores, docs))]
-    print(docs)
+    docs = [
+        x for _, x in sorted(zip(scores, docs), key=lambda pair: pair[0], reverse=True)
+    ]
     return docs
