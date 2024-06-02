@@ -31,7 +31,7 @@ ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
 
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_HOSTS", default=[])
 
-CORS_ALLOW_ALL_ORIGINS = DEBUG
+CORS_ALLOW_ALL_ORIGINS = env.bool("CORS_ALLOW_ALL_ORIGINS", default=DEBUG)
 
 ADMINS = [x.split(":") for x in env.list("DJANGO_ADMINS", default=[])]
 
