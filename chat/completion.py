@@ -8,7 +8,7 @@ from context.models import Document
 
 
 def format_doc(doc: Document):
-    return f"[{doc.content}]\n({doc.page.url})\n"
+    return f"[{doc.content}]\n({doc.page.url if doc.page else doc.pk})\n"
 
 
 def get_system_prompt(question, bot, docs, **kwargs):
