@@ -41,5 +41,7 @@ class Page(models.Model):
 
     error = models.TextField(blank=True)
 
+    stale = models.BooleanField(default=False)
+
     class Meta:
         indexes = [models.Index(fields=["url"])]

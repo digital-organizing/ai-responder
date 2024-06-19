@@ -116,6 +116,8 @@ def _create_doc(title, content, page, config):
     for paragraph in doc.find_all("p"):
         docs.append(paragraph.get_text())
 
+    page.document_set.all().update(stale=True)
+
     for i, d in enumerate(docs):
         if len(d) < 100 or len(d) > 2000:
             continue
@@ -124,11 +126,21 @@ def _create_doc(title, content, page, config):
         sha.update(d.encode())
         hash = sha.hexdigest()
 
-        Document.objects.update_or_create(
+        doc, created = Document.objects.update_or_create(
             content_hash=hash,
+            page=page,
             collection=config.target_collection,
-            defaults={"content": d, "title": title, "page": page, "number": i},
+            defaults={
+                "content": d,
+                "title": title,
+                "number": i,
+                "stale": False,
+            },
         )
+
+        if created:
+            doc.is_indexed = False
+            doc.save()
 
     print("Creating links")
     urls = create_links_for_website(content, config.start_url)
