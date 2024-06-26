@@ -202,6 +202,8 @@ QDRANT_PORT = env.int("QDRANT_PORT", default=6333)
 
 OPENAI_KEY = env("OPENAI_KEY", default="")
 
+INFOMANIAK_KEY = env("INFOMANIAK_KEY", default="")
+
 
 BATON = {
     "SITE_HEADER": "AI Collab",

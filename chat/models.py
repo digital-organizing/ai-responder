@@ -27,6 +27,8 @@ class ChatBot(models.Model):
     is_public = models.BooleanField()
 
     group = models.ForeignKey("auth.Group", models.CASCADE)
+    
+    base_url = models.CharField(blank=True, max_length=200)
 
 
 class Field(models.Model):

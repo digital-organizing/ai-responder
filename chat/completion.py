@@ -37,7 +37,10 @@ def get_messages(question, bot, docs, **kwargs):
 
 
 def get_completion(messages, bot, **kwargs):
-    client = openai.Client(api_key=settings.OPENAI_KEY)
+    if bot.base_url:
+        client = openai.Client(api_key=settings.INFOMANIAK_KEY, base_url=bot.base_url)
+    else:
+        client = openai.Client(api_key=settings.OPENAI_KEY)
     completion = client.chat.completions.create(
         messages=messages,
         model=bot.model,
