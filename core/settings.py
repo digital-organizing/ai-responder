@@ -293,7 +293,6 @@ POSTHOG_HOST = env("POSTHOG_HOST", default="https://eu.i.posthog.com")
 import sentry_sdk
 
 SENTRY_DSN = env("SENTRY_DSN", default="")
-SENTRY_URL = env("SENTRY_URL", default="")
 
 sentry_sdk.init(
     dsn=SENTRY_DSN,
