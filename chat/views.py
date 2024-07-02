@@ -76,3 +76,17 @@ def manage_chatbot(request, slug):
         raise PermissionError("You are not allowed to manage this bot")
 
     return render(request, "chat/manage_bot.html", {"bot": bot})
+
+
+def thread_init(request, slug):
+    # TODO: create a new thread with init message and question
+    # Important: 
+    # - 
+    pass
+
+
+def thread_continue(request, slug):
+    # TODO: add sent message to thread, get copmletion
+    # Important
+    # - 
+    pass

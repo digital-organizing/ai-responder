@@ -83,6 +83,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.sentry_dsn",
+                "core.context_processors.posthog_config",
             ],
         },
     },
@@ -282,3 +284,24 @@ BATON = {
 SELENIUM_URL = "http://selenium-hub:4444"
 
 LOGIN_REDIRECT_URL = "/"
+
+
+
+POSTHOG_KEY = env("POSTHOG_KEY", default="")
+POSTHOG_HOST = env("POSTHOG_HOST", default="https://eu.i.posthog.com")
+
+import sentry_sdk
+
+SENTRY_DSN = env("SENTRY_DSN", default="")
+SENTRY_URL = env("SENTRY_URL", default="")
+
+sentry_sdk.init(
+    dsn=SENTRY_DSN,
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    traces_sample_rate=0.1,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=0.1,
+)

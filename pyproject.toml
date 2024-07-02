@@ -48,6 +48,7 @@ dependencies = [
   "w3lib",
   "qdrant-client",
   "whitenoise[brotli]",
+  "sentry-sdk[django]",
 ]
 
 [build-system]

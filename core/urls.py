@@ -17,6 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+def error_view(request):
+    return f"This is: {1/0}"
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("baton/", include("baton.urls")),
