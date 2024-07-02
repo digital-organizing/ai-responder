@@ -106,6 +106,8 @@ def _crawl_selenium(config: CrawlConfig):
                 page.save()
                 page = get_next_url(config)
 
+            time.sleep(config.timeout)
+
 
 def _create_doc(title, content, page, config):
     print("Creating docs")
@@ -172,6 +174,7 @@ def _crawl_requests(config: CrawlConfig):
                 page.error = str(ex)
                 page.save()
                 page = get_next_url(config)
+            time.sleep(config.timeout)
 
 
 def create_links_for_website(content, source_url):
