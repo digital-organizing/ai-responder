@@ -18,9 +18,13 @@ $(document).ready(function () {
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     spinner.classList.remove("hidden");
+    const isFunction = e.submitter.value == 'function';
     const data = new FormData(form);
+    data.set("print_value", "print_value")
+    console.log(data)
+    url = isFunction ? `/${botSelect.val()}/function/` : `/${botSelect.val()}/`;
 
-    fetch(`/${botSelect.val()}/`, {
+    fetch(url, {
       method: "POST",
       body: data,
     })

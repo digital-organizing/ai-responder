@@ -1,4 +1,5 @@
 import time
+import traceback
 from contextlib import contextmanager
 from hashlib import sha1
 from typing import List, Optional, Set
@@ -101,6 +102,7 @@ def _crawl_selenium(config: CrawlConfig):
                 title, content = fetch_url(page.url, config, driver)
                 page = _create_doc(title, content, page, config)
             except Exception as ex:
+                traceback.print_exc()
                 page.last_fetched = timezone.now()
                 page.error = str(ex)
                 page.save()
@@ -136,7 +138,6 @@ def _create_doc(title, content, page, config):
                 "content": d,
                 "title": title,
                 "number": i,
-                "stale": False,
             },
         )
 

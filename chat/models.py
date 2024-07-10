@@ -29,6 +29,8 @@ class ChatBot(models.Model):
     group = models.ForeignKey("auth.Group", models.CASCADE)
     
     base_url = models.CharField(blank=True, max_length=200)
+    
+    functions = models.JSONField(blank=True)
 
 
 class Field(models.Model):

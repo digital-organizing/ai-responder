@@ -21,6 +21,7 @@ class CrawlConfig(models.Model):
     arguments = models.TextField(blank=True)
     
     timeout = models.FloatField(default=0.0)
+    
 
     def excludes(self):
         return [line.strip() for line in self.exclude_paths.split("\n") if line.strip()]

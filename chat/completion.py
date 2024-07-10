@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import openai
 from django.conf import settings
@@ -35,6 +35,13 @@ def get_messages(question, bot, docs, **kwargs):
     ]
     return messages
 
+
+def generate_function_call(question: str, bot: ChatBot, docs: List[Document],function: Optional[str], **kwargs):
+    messages = get_messages(question, bot, docs, **kwargs)
+
+    completion = get_completion(messages, bot, tools=bot.functions, **kwargs)
+
+    return completion
 
 def get_completion(messages, bot, **kwargs):
     if bot.base_url:

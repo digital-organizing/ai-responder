@@ -150,7 +150,6 @@ def reindex_documents(collection: Collection):
         if collection_exists(qdrant, collection.slug):
             qdrant.delete_collection(collection.slug)
 
-    Document.objects.filter(collection=collection, stale=True).delete()
     Document.objects.filter(collection=collection).update(is_indexed=False)
     index_documents(collection)
 

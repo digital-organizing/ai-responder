@@ -41,6 +41,9 @@ class Document(models.Model):
     content_hash = models.CharField(max_length=60, blank=True)
 
     file = models.ForeignKey(File, models.CASCADE, blank=True, null=True)
+    
+    
+    stale = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return super().__str__()
