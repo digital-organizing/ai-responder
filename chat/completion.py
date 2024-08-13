@@ -58,11 +58,16 @@ def get_completion(messages, bot, use_functions=False, **kwargs):
 
 def generate_answer(question: str, bot: ChatBot, docs: List[Document], **kwargs):
     messages = kwargs.pop('messages', [])
+    fields = [field.slug for field in bot.field_set.all()]
+
+    for field in fields:
+        kwargs[field] = kwargs.get(field, '')
+    
     new_messages = get_messages(question, bot, docs, **kwargs)
     messages += new_messages
     
-    for field in bot.field_set.all():
-        kwargs.pop(field.slug, '')
+    for field in fields:
+        kwargs.pop(field, '')
 
     return get_completion(messages, bot, **kwargs), new_messages
 
