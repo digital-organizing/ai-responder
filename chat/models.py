@@ -1,4 +1,5 @@
 from uuid import uuid4
+import json
 
 from django.db import models
 
@@ -56,6 +57,7 @@ class Thread(models.Model):
             {
                 "role": message.role,
                 "content": message.content,
+                "tools": json.dumps(message.tools),
             }
             for message in self.message_set.all()
         ]
@@ -67,3 +69,5 @@ class Message(models.Model):
 
     role = models.CharField(max_length=100)
     thread = models.ForeignKey(Thread, models.CASCADE)
+    
+    tools = models.JSONField(default=dict)

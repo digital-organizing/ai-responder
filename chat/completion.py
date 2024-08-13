@@ -26,41 +26,50 @@ def get_user_prompt(question, bot, docs, **kwargs):
 
 
 def get_messages(question, bot, docs, **kwargs):
-    system_prompt = get_system_prompt(question, bot, docs, **kwargs)
+    
+    messages = kwargs.pop('messages', [])
     user_prompt = get_user_prompt(question, bot, docs, **kwargs)
+    system_prompt = get_system_prompt(question, bot, docs, **kwargs)
 
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt},
-    ]
+    messages = [{"role": "system", "content": system_prompt}] + messages[-10:] + [{"role": "user", "content": user_prompt}]
+    
     return messages
 
 
-def generate_function_call(question: str, bot: ChatBot, docs: List[Document],function: Optional[str], **kwargs):
-    messages = get_messages(question, bot, docs, **kwargs)
-
-    completion = get_completion(messages, bot, tools=bot.functions, **kwargs)
-
-    return completion
-
-def get_completion(messages, bot, **kwargs):
+def get_completion(messages, bot, use_functions=False, **kwargs):
     if bot.base_url:
         client = openai.Client(api_key=settings.INFOMANIAK_KEY, base_url=bot.base_url)
     else:
         client = openai.Client(api_key=settings.OPENAI_KEY)
+        
+    if "tool_choice" in kwargs and kwargs['tool_choice'] != 'none':
+        tools = bot.functions
+    else:
+        tools = None
+
     completion = client.chat.completions.create(
         messages=messages,
         model=bot.model,
+        tools=tools,
         **kwargs,
     )
     return completion
 
 
 def generate_answer(question: str, bot: ChatBot, docs: List[Document], **kwargs):
+    messages = kwargs.pop('messages', [])
+    new_messages = get_messages(question, bot, docs, **kwargs)
+    messages += new_messages
+
+    return get_completion(messages, bot, **kwargs), new_messages
+
+
+def generate_function_call(question: str, bot: ChatBot, docs: List[Document],function: Optional[str], **kwargs):
     messages = get_messages(question, bot, docs, **kwargs)
 
-    return get_completion(messages, bot)
+    completion = get_completion(messages, bot, use_functions=True, **kwargs)
 
+    return completion, messages
 
 def query_tool():
     return {

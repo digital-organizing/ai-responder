@@ -19,7 +19,6 @@ class CrawlConfig(models.Model):
     include_paths = models.TextField(blank=True)
 
     arguments = models.TextField(blank=True)
-    
     timeout = models.FloatField(default=0.0)
     
 

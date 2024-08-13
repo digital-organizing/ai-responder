@@ -20,9 +20,10 @@ $(document).ready(function () {
     spinner.classList.remove("hidden");
     const isFunction = e.submitter.value == 'function';
     const data = new FormData(form);
-    data.set("print_value", "print_value")
-    console.log(data)
-    url = isFunction ? `/${botSelect.val()}/function/` : `/${botSelect.val()}/`;
+    if (isFunction) {
+      data.set("tool_choice", "required")
+    }
+    url = `/${botSelect.val()}/`;
 
     fetch(url, {
       method: "POST",
@@ -30,7 +31,7 @@ $(document).ready(function () {
     })
       .then((resp) => resp.json())
       .then((data) => {
-        document.querySelector("#answer-field").value = data["answer"];
+        document.querySelector("#answer-field").value = isFunction ? JSON.stringify(data['tools'], undefined, 2) : data["answer"];
         document.querySelector("#sources").innerHTML = data.docs
           .map(renderSource)
           .join("\n");
