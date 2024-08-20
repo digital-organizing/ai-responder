@@ -6,6 +6,8 @@ from django.conf import settings
 from chat.models import ChatBot, Message, Thread
 from context.models import Document
 
+from chat.guards import create_guard
+
 
 def format_doc(doc: Document):
     return f"[{doc.content}]\n({doc.page.url if doc.page else doc.pk})\n"
@@ -27,9 +29,11 @@ def get_user_prompt(question, bot, docs, **kwargs):
 
 def get_messages(question, bot, docs, **kwargs):
     
+    guard = create_guard()
+    
     messages = kwargs.pop('messages', [])
-    user_prompt = get_user_prompt(question, bot, docs, **kwargs)
-    system_prompt = get_system_prompt(question, bot, docs, **kwargs)
+    user_prompt = get_user_prompt(question, bot, docs, **kwargs, guard=guard)
+    system_prompt = get_system_prompt(question, bot, docs, **kwargs, guard=guard)
 
     messages = [{"role": "system", "content": system_prompt}] + messages[-10:] + [{"role": "user", "content": user_prompt}]
     
