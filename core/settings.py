@@ -63,6 +63,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -79,6 +80,8 @@ TEMPLATES = [
         "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
+
+            "builtins": ['django.templatetags.i18n'],
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
@@ -132,7 +135,7 @@ def _gettext(s: str) -> str:
     return s
 
 
-LANGUAGES = (("de-ch", _gettext("German")),)
+LANGUAGES = (("de-ch", _gettext("German")), ("fr-ch", _gettext("French")))
 
 TIME_ZONE = env.str("TIME_ZONE", default="UTC")
 
@@ -140,7 +143,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-# LOCALE_PATHS = [BASE_DIR / "locale"]
+LOCALE_PATHS = [BASE_DIR / "locale"]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/

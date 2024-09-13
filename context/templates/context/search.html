@@ -5,7 +5,7 @@
 
 <form id="search-form">
   <p>
-  <label for="collection-select">Textsammlung</label>
+  <label for="collection-select">{% trans "Textsammlung " %}</label>
   <select name="collection" id="collection-select">
     {% for group in groups %}
     <optgroup label="{{group.name}}">
@@ -18,14 +18,14 @@
   </p>
 
   <p>
-  <label>Suche</label>
+  <label>{% trans "Thema oder Frage eingeben" %}</label>
   <textarea name="question" ></textarea>
   </p>
   <p>
-  <label>Anzahl Resultate</label>
+  <label>{% trans "Anzahl Resultate" %}</label>
   <input type="number" name="n" value="5" />
   </p>
-  <button type="submit">Suche</button>
+  <button type="submit">{% trans "Suche" %}</button>
 </form>
 
 <article>

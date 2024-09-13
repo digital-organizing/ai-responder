@@ -3,19 +3,25 @@
 {% load static %}
 
 {% block content %}
-  <a class="button" href="{% url 'context:manage-collection' collection.slug %}">Zurück</a>
-  <h2>Text eingeben</h2>
+  <a class="button" href="{% url 'context:manage-collection' collection.slug %}">{% trans "Zurück" %}</a>
+  <h2>{% trans "Text eingeben" %}</h2>
   <div class="upload">
     <form method="post" action="{% url 'context:create-document' collection.slug %}">
+      <label>
+        {% trans "Frage/Thema" %}
       <input type="text" name="title" />
+      </label>
+      <label>
+        {% trans "Antwort/Definition/Zusammenfassung" %}
       <textarea name="content" required></textarea>
+      </label>
       <input type="date" name="date" />
       {% csrf_token %}
-      <button type="submit">Erstellen</button>
+      <button type="submit">{% trans "Erstellen" %}</button>
     </form>
   </div>
   <table>
-    <h2>Dokumente</h2>
+    <h2>{% trans "Liste der Referenztexte" %}</h2>
     <section>
       {% for document in documents %}
         <h3>{{ document.title }}</h3>
@@ -23,9 +29,11 @@
           <form method="post" action="{% url 'context:delete-document' collection.slug %}">
             {% csrf_token %}
             <input type="hidden" name="pk" value="{{ document.pk }}" />
-            <button type="submit">Löschen</button>
+            <button type="submit">{% trans "Löschen" %}</button>
           </form>
-          <a class="button" href="{% url 'context:update-document' collection.slug document.pk %}">Bearbeiten</a>
+          <a class="button" href="{% url 'context:update-document' collection.slug document.pk %}">
+            {% trans "Bearbeiten" %}
+          </a>
         </div>
         <p>{{ document.content }}</p>
       {% endfor %}

@@ -7,6 +7,7 @@ from django.utils import timezone
 class Collection(models.Model):
     slug = models.SlugField(unique=True, primary_key=True)
     language = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, blank=True)
 
     group = models.ForeignKey("auth.Group", models.CASCADE)
 

@@ -2,11 +2,17 @@
 {% load static %}
 
 {% block content %}
-  <a class="button" href="/manage/">Zurück</a>
-  <h2>Verwaltung: {{ collection.slug }}</h2>
+  <a class="button" href="/manage/">{% trans "Zurück" %}</a>
+  <h2>{% trans "Verwaltung:" %} {{collection.name}} {{ collection.slug }}</h2>
 
   <div class="buttons">
-    <a class="button" href="{% url 'context:document-list' collection.slug %}">Dokumente</a>
+    <a class="button" href="{% url 'context:document-list' collection.slug %}">Texte</a>
     <a class="button" href="{% url 'context:file-list' collection.slug %}">Dateien</a>
+
   </div>
+  <p>
+  {% blocktrans %}
+    Fügen Sie keine vertraulichen Texte oder Dokumente ein. Trotz aller Vorsichtsmassnahmen können wir das Risiko, dass diese angezeigt werden, nicht vollständig ausschliessen.
+  {% endblocktrans %}
+  </p>
 {% endblock %}

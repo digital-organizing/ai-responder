@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="{{request.LANGUAGE}}" color-mode="user">
+<html lang="{{request.LANGUAGE_CODE}}" color-mode="user">
 
 <head>
   <meta charset="UTF-8">
@@ -15,21 +15,18 @@
     <nav>
       <ul>
         <li>
-      <a href="/">Start</a>
+      <a href="/">{% trans "Start" %}</a>
       </li>
         <li>
-      <a href="/context/">Suche</a>
+      <a href="/context/">{% trans "Suche" %}</a>
       </li>
       <li>
-      <a href="#">Threads</a>
-      </li>
-      <li>
-        <a href="/manage/">Verwalten</a>
+        <a href="/manage/">{% trans "Verwalten" %}</a>
       </li>
       </ul>
 
     </nav>
-    <p>Chatbot Prototyp</p>
+    <p>{% trans "Fragebantwortungsbot" %}</p>
     {% block header %}
     {% endblock %}
   </header>

@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>Edit Document</h1>
+  <h1>{% trans "Dokument bearbeiten" %}</h1>
   <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    <label for="title">Title:</label>
+    <label for="title">{% trans "Titel" %}</label>
     <input type="text" id="title" name="title" value="{{ document.title }}" />
     <br />
     <br />
-    <label for="content">Content:</label>
+    <label for="content">{% trans "Inhalt" %}</label>
     <textarea id="content" name="content">{{ document.content }}</textarea>
 
     <br />

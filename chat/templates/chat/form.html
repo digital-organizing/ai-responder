@@ -4,7 +4,7 @@
 {% block content %}
 
 <p>
-<label for="bot">Chatbot-Konfiguration</label>
+<label for="bot">{% trans "Chatbot-Konfiguration" %}</label>
 <select name="bot" id="bot-select">
   {% for group in groups %}
   <optgroup label="{{group.name}}">
@@ -20,14 +20,11 @@
   <div id="bot-fields">
   </div>
   <p>
-    <label>Frage</label>
+    <label>{% trans "Frage" %}</label>
     <textarea required="true" name="question"></textarea>
   </p>
   <button type="submit">
-    Absenden
-  </button>
-  <button type="submit" value="function">
-    Funktions-Call
+    {% trans "Absenden" %}
   </button>
 </form>
 
@@ -40,7 +37,10 @@
     <div class="rect5"></div>
   </div>
   <textarea readonly="true" id="answer-field"></textarea>
+  <section>
+    <h3>{% trans "Quellen" %} </h3>
   <div id="sources"></div>
+  </section>
 </article>
 
 {% endblock %}

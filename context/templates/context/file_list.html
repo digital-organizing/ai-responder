@@ -3,14 +3,14 @@
 {% load static %}
 
 {% block content %}
-<a class="button" href="{% url 'context:manage-collection' collection.slug %}">Zurück</a>
-<h2>Datei hochladen</h2>
+<a class="button" href="{% url 'context:manage-collection' collection.slug %}">{% trans "Zurück" %}</a>
+<h2>{% trans "Datei hochladen" %}</h2>
 <div class="upload">
     <form method="post" enctype="multipart/form-data" action="{% url 'context:upload-file' collection.slug %}">
         <input type="text" name="name" />
         <input type="file" name="content" />
         {% csrf_token %}
-        <button type="submit">Hochladen</button>
+        <button type="submit">{% trans "Hochladen" %}</button>
     </form>
     </form>
 </div>
@@ -18,7 +18,7 @@
     <thead>
         <tr>
             <th>
-                Dateiname
+                {% trans "Dateiname" %}
             </th>
         </tr>
     </thead>
@@ -32,7 +32,7 @@
                 <form method="post" action="{% url 'context:delete-file' collection.slug %}">
                     {% csrf_token %}
                     <input type="hidden" name="pk" value="{{file.pk}}">
-                    <button type="submit">Löschen</button>
+                    <button type="submit">{% trans "Löschen" %}</button>
             </td>
         </tr>
         {% endfor %}

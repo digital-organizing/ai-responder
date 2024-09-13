@@ -1,0 +1,145 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-09-13 11:58+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: chat/templates/base.html:18
+msgid "Start"
+msgstr "Start"
+
+#: chat/templates/base.html:21 context/templates/context/search.html:28
+msgid "Suche"
+msgstr "Recherche"
+
+#: chat/templates/base.html:24
+msgid "Verwalten"
+msgstr "Gestion"
+
+#: chat/templates/base.html:29
+msgid "Fragebantwortungsbot"
+msgstr "Chatbot"
+
+#: chat/templates/chat/form.html:7
+msgid "Chatbot-Konfiguration"
+msgstr "Configuration du chatbot"
+
+#: chat/templates/chat/form.html:23
+msgid "Frage"
+msgstr "Question"
+
+#: chat/templates/chat/form.html:27
+msgid "Absenden"
+msgstr "Envoyer"
+
+#: chat/templates/chat/form.html:41 chat/templates/manage.html:7
+msgid "Quellen"
+msgstr "Sources"
+
+#: chat/templates/manage.html:4
+msgid "Chatbots und Quellen verwalten"
+msgstr "Gérer les chatbots et sources"
+
+#: chat/templates/manage.html:15
+msgid "Chatbots"
+msgstr "Chatbots"
+
+#: context/templates/context/document_list.html:6
+#: context/templates/context/file_list.html:6
+#: context/templates/context/manage_collection.html:5
+msgid "Zurück"
+msgstr "Retour"
+
+#: context/templates/context/document_list.html:7
+msgid "Text eingeben"
+msgstr "Texte"
+
+#: context/templates/context/document_list.html:11
+msgid "Frage/Thema"
+msgstr "Question/thème"
+
+#: context/templates/context/document_list.html:15
+msgid "Antwort/Definition/Zusammenfassung"
+msgstr "Réponse/définition/résumé"
+
+#: context/templates/context/document_list.html:20
+msgid "Erstellen"
+msgstr "Créer"
+
+#: context/templates/context/document_list.html:24
+msgid "Liste der Referenztexte"
+msgstr "Liste des textes de référence"
+
+#: context/templates/context/document_list.html:32
+#: context/templates/context/file_list.html:35
+msgid "Löschen"
+msgstr "Supprimer"
+
+#: context/templates/context/document_list.html:35
+msgid "Bearbeiten"
+msgstr "Modifier"
+
+#: context/templates/context/file_list.html:7
+msgid "Datei hochladen"
+msgstr "Télécharger"
+
+#: context/templates/context/file_list.html:13
+msgid "Hochladen"
+msgstr "Télécharger"
+
+#: context/templates/context/file_list.html:21
+msgid "Dateiname"
+msgstr "Nom de fichier"
+
+#: context/templates/context/manage_collection.html:6
+msgid "Verwaltung:"
+msgstr "Gestion"
+
+#: context/templates/context/manage_collection.html:14
+msgid ""
+"\n"
+"    Fügen Sie keine vertraulichen Texte oder Dokumente ein. Trotz aller "
+"Vorsichtsmassnahmen können wir das Risiko, dass diese angezeigt werden, "
+"nicht vollständig ausschliessen.\n"
+"  "
+msgstr ""
+"\n"
+"N'ajoutez pas de textes ou de documents confidentiels. Malgré toutes les précautions prises, nous ne pouvons pas exclure totalement le risque qu'ils soient diffusés.\n"
+" "
+
+#: context/templates/context/search.html:8
+msgid "Textsammlung "
+msgstr "Recueil de textes"
+
+#: context/templates/context/search.html:21
+msgid "Thema oder Frage eingeben"
+msgstr "Indiquez le thème ou la question"
+
+#: context/templates/context/search.html:25
+msgid "Anzahl Resultate"
+msgstr "Nombre de résultats"
+
+#: context/templates/context/update_document.html:4
+msgid "Dokument bearbeiten"
+msgstr "Modifier le document"
+
+#: context/templates/context/update_document.html:7
+msgid "Titel"
+msgstr "Titre"
+
+#: context/templates/context/update_document.html:11
+msgid "Inhalt"
+msgstr "Contenu"
