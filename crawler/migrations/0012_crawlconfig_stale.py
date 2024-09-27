@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('crawler', '0011_crawlconfig_timeout'),
+        ("crawler", "0011_crawlconfig_timeout"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='crawlconfig',
-            name='stale',
+            model_name="crawlconfig",
+            name="stale",
             field=models.BooleanField(default=False),
         ),
     ]

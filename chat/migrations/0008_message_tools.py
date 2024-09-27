@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chat', '0007_chatbot_functions'),
+        ("chat", "0007_chatbot_functions"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='message',
-            name='tools',
+            model_name="message",
+            name="tools",
             field=models.JSONField(default=dict),
         ),
     ]

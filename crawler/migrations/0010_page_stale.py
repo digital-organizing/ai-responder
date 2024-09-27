@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('crawler', '0009_crawlconfig_include_paths'),
+        ("crawler", "0009_crawlconfig_include_paths"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='page',
-            name='stale',
+            model_name="page",
+            name="stale",
             field=models.BooleanField(default=False),
         ),
     ]

@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('crawler', '0012_crawlconfig_stale'),
+        ("crawler", "0012_crawlconfig_stale"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='crawlconfig',
-            name='stale',
+            model_name="crawlconfig",
+            name="stale",
         ),
     ]

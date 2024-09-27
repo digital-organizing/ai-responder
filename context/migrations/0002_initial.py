@@ -9,20 +9,24 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('crawler', '0001_initial'),
-        ('auth', '0012_alter_user_first_name_max_length'),
-        ('context', '0001_initial'),
+        ("crawler", "0001_initial"),
+        ("auth", "0012_alter_user_first_name_max_length"),
+        ("context", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='document',
-            name='page',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='crawler.page'),
+            model_name="document",
+            name="page",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="crawler.page"
+            ),
         ),
         migrations.AddField(
-            model_name='collection',
-            name='group',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='auth.group'),
+            model_name="collection",
+            name="group",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="auth.group"
+            ),
         ),
     ]

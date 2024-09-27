@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     "django_celery_results",
     "django_celery_beat",
     "baton.autodiscover",
-    'django_json_widget',
+    "django_json_widget",
 ]
 
 MIDDLEWARE = [
@@ -80,8 +80,7 @@ TEMPLATES = [
         "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
-
-            "builtins": ['django.templatetags.i18n'],
+            "builtins": ["django.templatetags.i18n"],
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
@@ -288,7 +287,6 @@ BATON = {
 SELENIUM_URL = "http://selenium-hub:4444"
 
 LOGIN_REDIRECT_URL = "/"
-
 
 
 POSTHOG_KEY = env("POSTHOG_KEY", default="")

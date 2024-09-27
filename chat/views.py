@@ -29,29 +29,27 @@ def answer_view(request: HttpRequest, slug):
     bot = ChatBot.objects.get(slug=slug)
     docs = []
 
-    data.pop("csrfmiddlewaretoken", '')
+    data.pop("csrfmiddlewaretoken", "")
     if bot.context_provider:
         results = search(bot.context_provider.slug, q, limit=10)
         docs = get_documents(results)
 
     answer, _ = generate_answer(q, bot, docs, **data)
 
-    message : openai = answer.choices[0].message
-    content = message.content or ''
+    message: openai = answer.choices[0].message
+    content = message.content or ""
     tools = message.tool_calls or []
     if len(tools) > 0:
         try:
             tools = json.loads(tools[0].function.arguments)
         except json.JSONDecodeError as er:
-            tools = []    
+            tools = []
 
     serializer = DocumentSerializer(docs, many=True)
 
-    return JsonResponse({
-        "tools": tools,
-        "answer": content.replace("ß", "ss"),
-        "docs": serializer.data
-    })
+    return JsonResponse(
+        {"tools": tools, "answer": content.replace("ß", "ss"), "docs": serializer.data}
+    )
 
 
 @login_required
@@ -101,25 +99,25 @@ def thread_init(request, slug):
     bot = ChatBot.objects.get(slug=slug)
     docs = []
 
-    data.pop("csrfmiddlewaretoken", '')
+    data.pop("csrfmiddlewaretoken", "")
 
     if bot.context_provider:
         results = search(bot.context_provider.slug, q, limit=10)
         docs = get_documents(results)
 
     answer, messages = generate_answer(q, bot, docs, **data)
-    
+
     # Init the thread
     thread = Thread.objects.create(bot=bot)
 
     for message in messages:
         thread.message_set.create(
-            content=message['content'],
-            role=message['role'],
+            content=message["content"],
+            role=message["role"],
         )
 
     message = answer.choices[0].message
-    content = message.content or ''
+    content = message.content or ""
     content = content.replace("ß", "ss")
     tools = message.tool_calls or []
 
@@ -127,14 +125,9 @@ def thread_init(request, slug):
         try:
             tools = json.loads(tools[0].function.arguments)
         except json.JSONDecodeError as er:
-            tools = []    
-    
+            tools = []
 
-    thread.message_set.create(
-        content=content,
-        tools=tools,
-        role='assistant'
-    )
+    thread.message_set.create(content=content, tools=tools, role="assistant")
 
     serializer = DocumentSerializer(docs, many=True)
 
@@ -147,17 +140,18 @@ def thread_init(request, slug):
         }
     )
 
+
 @csrf_exempt
 def thread_continue(request, slug):
-    
-    if request.method == 'GET':
-        thread_id = request.GET.get('pk')
+
+    if request.method == "GET":
+        thread_id = request.GET.get("pk")
         thread = Thread.objects.get(pk=thread_id)
-        return JsonResponse({'messages': thread.messages()[1:]})
+        return JsonResponse({"messages": thread.messages()[1:]})
 
     data = request.POST.dict()
 
-    data.pop("csrfmiddlewaretoken", '')
+    data.pop("csrfmiddlewaretoken", "")
 
     q = str(data.pop("question"))[-10_000:]
 
@@ -168,13 +162,13 @@ def thread_continue(request, slug):
         results = search(bot.context_provider.slug, q, limit=10)
         docs = get_documents(results)
 
-    thread = Thread.objects.get(pk=data.pop('threadId'))
+    thread = Thread.objects.get(pk=data.pop("threadId"))
     messages = thread.messages()
 
     answer, messages = generate_answer(q, bot, docs, messages=messages, **data)
 
     message = answer.choices[0].message
-    content = message.content or ''
+    content = message.content or ""
 
     content = content.replace("ß", "ss")
     tools = message.tool_calls or []
@@ -183,18 +177,20 @@ def thread_continue(request, slug):
         try:
             tools = json.loads(tools[0].function.arguments)
         except json.JSONDecodeError as er:
-            tools = []    
+            tools = []
 
     msg = messages[-1]
-    
-    thread.message_set.create(role=msg['role'], content=msg['content'])
-    thread.message_set.create(role='assistant', content=content, tools=tools)
+
+    thread.message_set.create(role=msg["role"], content=msg["content"])
+    thread.message_set.create(role="assistant", content=content, tools=tools)
 
     serializer = DocumentSerializer(docs, many=True)
-    
-    return JsonResponse({
-        "tools": tools,
-        "answer": content,
-        "docs": serializer.data,
-        "threadId": thread.pk,
-    })
+
+    return JsonResponse(
+        {
+            "tools": tools,
+            "answer": content,
+            "docs": serializer.data,
+            "threadId": thread.pk,
+        }
+    )

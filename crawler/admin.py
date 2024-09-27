@@ -23,10 +23,18 @@ class CrawlConfigAdmin(admin.ModelAdmin):
     def get_queryset(self, request: Any) -> QuerySet[Any]:
         if request.user.is_superuser:
             return super().get_queryset(request)
-        return super().get_queryset(request).filter(group__in=request.user.groups)
+        return super().get_queryset(request).filter(group__in=request.user.groups.all())
 
-    def has_add_permission(self, request: Any) -> bool:
-        return request.user.is_superuser
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+
+        if not request.user.is_superuser:
+            form.base_fields["target_collection"].queryset = form.base_fields[
+                "target_collection"
+            ].queryset.filter(group__in=request.user.groups.all())
+            form.base_fields["group"].queryset = request.user.groups.all()
+
+        return form
 
 
 @admin.register(Page)

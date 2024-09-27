@@ -7,21 +7,28 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='ChatBot',
+            name="ChatBot",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('slug', models.SlugField(max_length=100, unique=True)),
-                ('system_prompt_template', models.TextField(blank=True)),
-                ('user_prompt_template', models.TextField(blank=True)),
-                ('model_max_length', models.IntegerField()),
-                ('output_max_length', models.IntegerField()),
-                ('is_public', models.BooleanField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("slug", models.SlugField(max_length=100, unique=True)),
+                ("system_prompt_template", models.TextField(blank=True)),
+                ("user_prompt_template", models.TextField(blank=True)),
+                ("model_max_length", models.IntegerField()),
+                ("output_max_length", models.IntegerField()),
+                ("is_public", models.BooleanField()),
             ],
         ),
     ]

@@ -28,15 +28,19 @@ def get_user_prompt(question, bot, docs, **kwargs):
 
 
 def get_messages(question, bot, docs, **kwargs):
-    
+
     guard = create_guard()
-    
-    messages = kwargs.pop('messages', [])
+
+    messages = kwargs.pop("messages", [])
     user_prompt = get_user_prompt(question, bot, docs, **kwargs, guard=guard)
     system_prompt = get_system_prompt(question, bot, docs, **kwargs, guard=guard)
 
-    messages = [{"role": "system", "content": system_prompt}] + messages[-10:] + [{"role": "user", "content": user_prompt}]
-    
+    messages = (
+        [{"role": "system", "content": system_prompt}]
+        + messages[-10:]
+        + [{"role": "user", "content": user_prompt}]
+    )
+
     return messages
 
 
@@ -45,8 +49,8 @@ def get_completion(messages, bot, use_functions=False, **kwargs):
         client = openai.Client(api_key=settings.INFOMANIAK_KEY, base_url=bot.base_url)
     else:
         client = openai.Client(api_key=settings.OPENAI_KEY)
-        
-    if "tool_choice" in kwargs and kwargs['tool_choice'] != 'none':
+
+    if "tool_choice" in kwargs and kwargs["tool_choice"] != "none":
         tools = bot.functions
     else:
         tools = None
@@ -61,27 +65,30 @@ def get_completion(messages, bot, use_functions=False, **kwargs):
 
 
 def generate_answer(question: str, bot: ChatBot, docs: List[Document], **kwargs):
-    messages = kwargs.pop('messages', [])
+    messages = kwargs.pop("messages", [])
     fields = [field.slug for field in bot.field_set.all()]
 
     for field in fields:
-        kwargs[field] = kwargs.get(field, '')
-    
+        kwargs[field] = kwargs.get(field, "")
+
     new_messages = get_messages(question, bot, docs, **kwargs)
     messages += new_messages
-    
+
     for field in fields:
-        kwargs.pop(field, '')
+        kwargs.pop(field, "")
 
     return get_completion(messages, bot, **kwargs), new_messages
 
 
-def generate_function_call(question: str, bot: ChatBot, docs: List[Document],function: Optional[str], **kwargs):
+def generate_function_call(
+    question: str, bot: ChatBot, docs: List[Document], function: Optional[str], **kwargs
+):
     messages = get_messages(question, bot, docs, **kwargs)
 
     completion = get_completion(messages, bot, use_functions=True, **kwargs)
 
     return completion, messages
+
 
 def query_tool():
     return {

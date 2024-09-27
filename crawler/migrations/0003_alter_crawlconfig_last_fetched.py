@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('crawler', '0002_alter_page_last_fetched'),
+        ("crawler", "0002_alter_page_last_fetched"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='crawlconfig',
-            name='last_fetched',
+            model_name="crawlconfig",
+            name="last_fetched",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

@@ -9,28 +9,55 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('context', '0005_alter_document_page'),
+        ("context", "0005_alter_document_page"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DocumentMeta',
+            name="DocumentMeta",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date", models.DateTimeField(default=django.utils.timezone.now)),
             ],
         ),
         migrations.CreateModel(
-            name='File',
+            name="File",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('content', models.FileField(upload_to=context.models.get_upload_name)),
-                ('collection', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='context.collection')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("content", models.FileField(upload_to=context.models.get_upload_name)),
+                (
+                    "collection",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="context.collection",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='document',
-            name='file',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='context.file'),
+            model_name="document",
+            name="file",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="context.file",
+            ),
         ),
     ]

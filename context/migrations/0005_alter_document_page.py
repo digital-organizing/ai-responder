@@ -7,14 +7,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('context', '0004_document_content_hash'),
-        ('crawler', '0009_crawlconfig_include_paths'),
+        ("context", "0004_document_content_hash"),
+        ("crawler", "0009_crawlconfig_include_paths"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='document',
-            name='page',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='crawler.page'),
+            model_name="document",
+            name="page",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="crawler.page",
+            ),
         ),
     ]

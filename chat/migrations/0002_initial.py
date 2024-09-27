@@ -9,20 +9,27 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
-        ('context', '0001_initial'),
-        ('chat', '0001_initial'),
+        ("auth", "0012_alter_user_first_name_max_length"),
+        ("context", "0001_initial"),
+        ("chat", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='chatbot',
-            name='context_provider',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='context.collection'),
+            model_name="chatbot",
+            name="context_provider",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="context.collection",
+            ),
         ),
         migrations.AddField(
-            model_name='chatbot',
-            name='group',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='auth.group'),
+            model_name="chatbot",
+            name="group",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="auth.group"
+            ),
         ),
     ]

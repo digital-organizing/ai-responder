@@ -9,7 +9,7 @@ from django.db import models
 class ChatBot(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
-    
+
     description = models.TextField(blank=True)
 
     system_prompt_template = models.TextField(blank=True)
@@ -30,10 +30,13 @@ class ChatBot(models.Model):
     is_public = models.BooleanField()
 
     group = models.ForeignKey("auth.Group", models.CASCADE)
-    
+
     base_url = models.CharField(blank=True, max_length=200)
-    
+
     functions = models.JSONField(blank=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Field(models.Model):
@@ -71,5 +74,5 @@ class Message(models.Model):
 
     role = models.CharField(max_length=100)
     thread = models.ForeignKey(Thread, models.CASCADE)
-    
+
     tools = models.JSONField(default=dict)
