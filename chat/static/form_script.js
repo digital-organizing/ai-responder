@@ -5,9 +5,9 @@ $(document).ready(function () {
   function loadSlug() {
     const slug = botSelect.val();
     fetch(`/${slug}/fields/`)
-      .then(resp => {if (resp.ok()) {return resp} throw Error()})
       .then((resp) => resp.text())
       .then((text) => {
+        console.log(text)
         document.querySelector("#bot-fields").innerHTML = text;
       }).catch(() => { });
   }
