@@ -10,7 +10,11 @@ from chat.guards import create_guard
 
 
 def format_doc(doc: Document):
-    return f"[{doc.content}]\n({doc.page.url if doc.page else doc.pk})\n"
+    if doc.page and doc.page.published_at:
+        date = doc.page.published_at.strftime(', (%Y-%m-%d)')
+    else:
+        date = ''
+    return f"[{doc.content}]\n({doc.page.url if doc.page else doc.pk}{date})\n"
 
 
 def get_system_prompt(question, bot, docs, **kwargs):
