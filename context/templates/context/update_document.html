@@ -2,6 +2,7 @@
 
 {% block content %}
   <h1>{% trans "Dokument bearbeiten" %}</h1>
+  {% if request.user.is_staff %}
   <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <label for="title">{% trans "Titel" %}</label>
@@ -10,8 +11,8 @@
     <br />
     <label for="content">{% trans "Inhalt" %}</label>
     <textarea id="content" name="content">{{ document.content }}</textarea>
-
     <br />
     <input type="submit" value="Save" />
   </form>
+  {% endif %}
 {% endblock %}

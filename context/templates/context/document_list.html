@@ -5,6 +5,7 @@
 {% block content %}
   <a class="button" href="{% url 'context:manage-collection' collection.slug %}">{% trans "Zurück" %}</a>
   <h2>{% trans "Text eingeben" %}</h2>
+  {% if request.user.is_staff %}
   <div class="upload">
     <form method="post" action="{% url 'context:create-document' collection.slug %}">
       <label>
@@ -20,12 +21,14 @@
       <button type="submit">{% trans "Erstellen" %}</button>
     </form>
   </div>
+  {% endif %}
   <table>
     <h2>{% trans "Liste der Referenztexte" %}</h2>
     <section>
       {% for document in documents %}
         <h3>{{ document.title }}</h3>
         <div>
+          {% if request.user.is_staff %}
           <form method="post" action="{% url 'context:delete-document' collection.slug %}">
             {% csrf_token %}
             <input type="hidden" name="pk" value="{{ document.pk }}" />
@@ -34,6 +37,7 @@
           <a class="button" href="{% url 'context:update-document' collection.slug document.pk %}">
             {% trans "Bearbeiten" %}
           </a>
+          {% endif %}
         </div>
         <p>{{ document.content }}</p>
       {% endfor %}

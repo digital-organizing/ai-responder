@@ -6,13 +6,14 @@
 <a class="button" href="{% url 'context:manage-collection' collection.slug %}">{% trans "Zurück" %}</a>
 <h2>{% trans "Datei hochladen" %}</h2>
 <div class="upload">
+    {% if request.user.is_staff %}
     <form method="post" enctype="multipart/form-data" action="{% url 'context:upload-file' collection.slug %}">
         <input type="text" name="name" />
         <input type="file" name="content" />
         {% csrf_token %}
         <button type="submit">{% trans "Hochladen" %}</button>
     </form>
-    </form>
+    {% endif %}
 </div>
 <table>
     <thead>
@@ -29,10 +30,13 @@
                 {{file.content.name}}
             </td>
             <td>
+                {% if request.user.is_staff %}
                 <form method="post" action="{% url 'context:delete-file' collection.slug %}">
                     {% csrf_token %}
                     <input type="hidden" name="pk" value="{{file.pk}}">
                     <button type="submit">{% trans "Löschen" %}</button>
+                </form>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}

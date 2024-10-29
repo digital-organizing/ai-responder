@@ -81,6 +81,9 @@ def list_files(request, slug):
 
 @login_required
 def delete_file(request, slug):
+    if not request.user.is_staff:
+        raise PermissionDenied()
+
     collection = _check_access(slug, request.user)
 
     pk = request.POST["pk"]
@@ -96,6 +99,9 @@ def delete_file(request, slug):
 
 @login_required
 def upload_file(request, slug):
+    if not request.user.is_staff:
+        raise PermissionDenied()
+
     collection = _check_access(slug, request.user)
 
     f = File.objects.create(
@@ -159,6 +165,9 @@ def get_hash(content):
 
 @login_required
 def create_document(request, slug):
+    if not request.user.is_staff:
+        raise PermissionDenied()
+
     collection = _check_access(slug, request.user)
     content = request.POST["content"]
 
@@ -183,6 +192,9 @@ def create_document(request, slug):
 
 @login_required
 def update_document(request, slug, pk):
+    if not request.user.is_staff:
+        raise PermissionDenied()
+
     collection = _check_access(slug, request.user)
     doc = collection.document_set.get(pk=pk)
 
@@ -205,6 +217,9 @@ def update_document(request, slug, pk):
 
 @login_required
 def delete_document(request, slug):
+    if not request.user.is_staff:
+        raise PermissionDenied()
+
     collection = _check_access(slug, request.user)
     pk = request.POST["pk"]
 
