@@ -1,4 +1,9 @@
 import time
+
+from django.utils.timezone import make_aware, is_aware
+from dateutil.parser import parse
+from datetime import datetime
+import json
 import traceback
 from contextlib import contextmanager
 from hashlib import sha1
@@ -110,14 +115,43 @@ def _crawl_selenium(config: CrawlConfig):
 
             time.sleep(config.timeout)
 
+def get_published_date(soup) -> Optional[datetime]:
+
+    print(soup)
+    # Check common meta tags for publication date
+    meta_tags = [
+        {"property": "article:published_time"},
+        {"property": "og:published_time"},
+        {"name": "DC.date.issued"},
+        {"name": "date"},
+        {"itemprop": "datePublished"},
+    ]
+
+    for tag_attrs in meta_tags:
+        tag = soup.find("meta", attrs=tag_attrs)
+        if tag and tag.get("content"):
+            return parse(tag["content"])
+
+    # Check JSON-LD structured data
+    json_ld_script = soup.find("script", type="application/ld+json")
+    if json_ld_script:
+        try:
+            data = json.loads(json_ld_script.string)
+            if isinstance(data, dict) and "datePublished" in data:
+                return parse(data["datePublished"])
+        except (json.JSONDecodeError, KeyError):
+            pass
+
+    # If no date is found, return None
+    return None
 
 def _create_doc(title, content, page, config):
     print("Creating docs")
-    doc = BeautifulSoup(content, "lxml")
+    soup = BeautifulSoup(content, "lxml")
 
     docs = []
 
-    for paragraph in doc.find_all("p"):
+    for paragraph in soup.find_all("p"):
         docs.append(paragraph.get_text())
 
     page.document_set.all().update(stale=True)
@@ -156,6 +190,12 @@ def _create_doc(title, content, page, config):
     )
 
     page.last_fetched = timezone.now()
+    published_at = get_published_date(soup)
+
+    if published_at and not is_aware(published_at):
+        published_at = make_aware(published_at)
+    print(published_at)
+    page.published_at = published_at
     page.save()
 
     print("Next page..")

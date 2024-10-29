@@ -39,6 +39,7 @@ class Page(models.Model):
     domain = models.CharField(max_length=500)
 
     last_fetched = models.DateTimeField(blank=True, null=True)
+    published_at = models.DateTimeField(blank=True, null=True)
 
     error = models.TextField(blank=True)
 
