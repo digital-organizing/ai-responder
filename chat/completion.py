@@ -58,6 +58,8 @@ def get_completion(messages, bot, use_functions=False, **kwargs):
         tools = bot.functions
     else:
         tools = None
+        
+    messages = [{"role": message["role"], "content": message["content"]} for message in messages]
 
     completion = client.chat.completions.create(
         messages=messages,

@@ -56,7 +56,7 @@ class Thread(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid4)
 
     message_set: models.QuerySet["Message"]
-
+    
     def messages(self):
         return [
             {
