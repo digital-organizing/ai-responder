@@ -49,6 +49,7 @@ dependencies = [
   "qdrant-client",
   "whitenoise[brotli]",
   "sentry-sdk[django]",
+  "djangorestframework-api-key",
 ]
 
 [build-system]
