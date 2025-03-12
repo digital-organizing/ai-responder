@@ -1,4 +1,5 @@
 import time
+from selenium.webdriver.common.proxy import Proxy as SeleniumProxy, ProxyType
 
 from django.utils.timezone import make_aware, is_aware
 from dateutil.parser import parse
@@ -89,6 +90,10 @@ def crawl_page_selenium(page: Page, config: CrawlConfig):
 
 def crawl_page_requests(page: Page, config: CrawlConfig):
     print("Crawling pages")
+    proxies = None
+    if config.proxy:
+        proxies = {"http": config.proxy.url, "https": config.proxy.url}
+
     with requests.session() as session:
         try:
             title, content = fetch_url_requests(page.url, session)
@@ -114,6 +119,7 @@ def _crawl_selenium(config: CrawlConfig):
                 page = get_next_url(config)
 
             time.sleep(config.timeout)
+
 
 def get_published_date(soup) -> Optional[datetime]:
 
@@ -144,6 +150,7 @@ def get_published_date(soup) -> Optional[datetime]:
 
     # If no date is found, return None
     return None
+
 
 def _create_doc(title, content, page, config):
     print("Creating docs")
@@ -205,6 +212,9 @@ def _create_doc(title, content, page, config):
 def _crawl_requests(config: CrawlConfig):
     page = get_next_url(config)
     with requests.Session() as s:
+        if config.proxy:
+            s.proxies = {"http": config.proxy.url, "https": config.proxy.url}
+            s.verify = False
         while page is not None:
             try:
                 title, content = fetch_url_requests(page.url, s)
@@ -240,6 +250,15 @@ def load_driver(c: CrawlConfig):
         if argument:
             options.add_argument(argument.strip())
 
+    if c.proxy:
+        options.proxy = SeleniumProxy(
+            {
+                "proxyType": ProxyType.MANUAL,
+                "httpProxy": c.proxy.url,
+                "sslProxy": c.proxy.url,
+            }
+        )
+        options.accept_insecure_certs = True
     driver = webdriver.Remote(settings.SELENIUM_URL, options=options)
 
     try:

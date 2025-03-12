@@ -11,9 +11,9 @@ from chat.guards import create_guard
 
 def format_doc(doc: Document):
     if doc.page and doc.page.published_at:
-        date = doc.page.published_at.strftime(', (%Y-%m-%d)')
+        date = doc.page.published_at.strftime(", (%Y-%m-%d)")
     else:
-        date = ''
+        date = ""
     return f"[{doc.content}]\n({doc.page.url if doc.page else doc.pk}{date})\n"
 
 

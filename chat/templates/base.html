@@ -8,6 +8,9 @@
   <title>{{ title }} | AI Toolbox</title>
   <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
   <link href="{% static 'style.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'dataTables.min.css' %}">
+  {% block styles %}
+  {% endblock %}
 </head>
 
 <body>
@@ -22,6 +25,9 @@
       </li>
       <li>
         <a href="/manage/">{% trans "Verwalten" %}</a>
+      </li>
+      <li>
+        <a href="{% url 'insights:entry' %}">{% trans "Auswertung" %}</a>
       </li>
       </ul>
 

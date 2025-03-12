@@ -28,5 +28,6 @@ urlpatterns = [
     path("baton/", include("baton.urls")),
     path("context/", include("context.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
+    path("insights/", include("insights.urls")),
     path("", include("chat.urls")),
 ]

@@ -83,3 +83,18 @@ a svg {
     -webkit-transform: scaleY(1.0);
   }
 }
+
+.stats-form {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 3px;
+}
+.stats-form button {
+  align-self: flex-end;
+}
+
+td.nr {
+  text-align: right;
+}

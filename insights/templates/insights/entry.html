@@ -1,0 +1,16 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<section>
+    <nav>
+        <a href="{% url 'insights:overview' %}">Nachrichtenübersicht</a>
+        <a href="{% url 'insights:stats' %}">Statistiken</a>
+    </nav>
+        
+    
+</section>
+
+{% endblock %}

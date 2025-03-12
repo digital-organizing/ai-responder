@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<form method="get" class="stats-form">
+    {{ form.as_div }}
+    <button type="submit">Anwenden</button>
+</form>
+
+{% if messages %}
+<section>
+    <h2>Statistiken</h2>
+    <p>Im gewählten Zeitraum sind {{ total_messages }} Nachrichten eingegangen.</p>
+    <p>Die folgende Tabelle zeigt die Anzahl der Nachrichten pro {{ unit }}.</p>
+</section>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Zeitraum</th>
+            <th>Anzahl</th>
+        </tr>
+    </thead> 
+    <tbody>
+        {% for message in messages %}
+            <tr>
+                <td>{{ message.range_start|date:"d.m.Y" }} - {{ message.range_end|date:"d.m.Y" }} </td>
+                <td class="nr">{{ message.count }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if form.is_valid and not messages %}
+Keine Nachrichten im ausgewählten Zeitraum!
+{% endif %}
+
+
+{% endblock %}

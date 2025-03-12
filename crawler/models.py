@@ -21,6 +21,8 @@ class CrawlConfig(models.Model):
     arguments = models.TextField(blank=True)
     timeout = models.FloatField(default=0.0)
 
+    proxy = models.ForeignKey("Proxy", models.CASCADE, blank=True, null=True)
+
     def excludes(self):
         return [line.strip() for line in self.exclude_paths.split("\n") if line.strip()]
 
@@ -47,3 +49,10 @@ class Page(models.Model):
 
     class Meta:
         indexes = [models.Index(fields=["url"])]
+
+
+class Proxy(models.Model):
+    url = models.CharField(max_length=2000, unique=True)
+
+    def __str__(self):
+        return self.url

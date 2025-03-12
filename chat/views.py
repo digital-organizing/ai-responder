@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from langdetect import detect
 
 from chat.completion import generate_answer
+from chat.message import store_question
 from chat.models import ChatBot, Thread, Message
 from context.search import get_documents, search
 from context.serializers import DocumentSerializer
@@ -45,6 +46,17 @@ def answer_view(request: HttpRequest, slug):
         except json.JSONDecodeError as er:
             tools = []
 
+    thread = Thread.objects.create(bot=bot)
+    msg = thread.message_set.create(
+        content=q,
+        role="user",
+    )
+    store_question(msg, bot)
+    thread.message_set.create(
+        content=content.replace("ß", "ss"),
+        tools=tools,
+        role="assistant",
+    )
     serializer = DocumentSerializer(docs, many=True)
 
     return JsonResponse(
@@ -111,10 +123,13 @@ def thread_init(request, slug):
     thread = Thread.objects.create(bot=bot)
 
     for message in messages:
-        thread.message_set.create(
+        msg = thread.message_set.create(
             content=message["content"],
             role=message["role"],
         )
+
+        if message["role"] == "user":
+            store_question(msg, bot)
 
     message = answer.choices[0].message
     content = message.content or ""
@@ -181,7 +196,9 @@ def thread_continue(request, slug):
 
     msg = messages[-1]
 
-    thread.message_set.create(role=msg["role"], content=msg["content"])
+    msg = thread.message_set.create(role=msg["role"], content=msg["content"])
+    store_question(msg, bot)
+
     thread.message_set.create(role="assistant", content=content, tools=tools)
 
     serializer = DocumentSerializer(docs, many=True)

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<table>
+    <thead>
+        <tr>
+            <th>Nachricht</th>
+            <th>Zeitpunkt</th>
+            <th>Anzahl Nachrichten</th>
+            <th>Chatbot</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for thread in page %}
+        <tr>
+            <td>
+                <a href="{% url 'insights:thread-detail' thread.pk %}">{{ thread }}</a>
+            </td>
+            <td>
+                {{ thread.first_message_date }}
+            </td>
+            <td>
+                {{ thread.message_count }}
+            </td>
+            <td>
+                {{ thread.bot.name }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

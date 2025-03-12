@@ -63,9 +63,22 @@ class Thread(models.Model):
                 "role": message.role,
                 "content": message.content,
                 "tools": json.dumps(message.tools),
+                "created_at": message.created_at,
             }
-            for message in self.message_set.all()
+            for message in self.message_set.all().order_by("created_at")
         ]
+
+    def initial_message(self):
+        return self.message_set.filter(role="user").first()
+
+    def message_count(self):
+        return self.message_set.exclude(role="system").count()
+
+    def __str__(self):
+        initial_message = self.initial_message()
+        if initial_message is not None:
+            return initial_message.content[:50]
+        return "No initial message"
 
 
 class Message(models.Model):
@@ -75,4 +88,4 @@ class Message(models.Model):
     role = models.CharField(max_length=100)
     thread = models.ForeignKey(Thread, models.CASCADE)
 
-    tools = models.JSONField(default=dict)
+    tools = models.JSONField(default=dict, blank=True)

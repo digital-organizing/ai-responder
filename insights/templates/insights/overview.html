@@ -1,0 +1,44 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+
+<table class="table" id="threadTable">
+    <thead>
+        <tr>
+            <th>Nachricht</th>
+            <th>Thread</th>
+            <th>Rolle</th>
+            <th>Datum</th>
+            <th>Bot</th>
+        </tr>
+    </thead>
+    <tbody>
+       {% for message in page %} 
+       <tr>
+             <td>
+                 <a href="{% url 'insights:message-detail' message.pk %}">
+                {{ message.content|default:message.tools }}
+                 </a>
+              </td>
+              <td>
+                  <a href="{% url 'insights:thread-detail' message.thread.pk %}">{{ message.pk }}</a>
+              </td>
+              <td>{{ message.role }}</td>
+              <td>{{ message.created_at }}</td>
+              <td>{{ message.thread.bot }}</td>
+       </tr>
+       {% endfor %}
+    </tbody>
+</table>
+
+<script src="{% static 'jquery-3.7.1.slim.min.js' %}"></script>
+<script src="{% static 'dataTables.min.js' %}"></script>
+<script src="{% static 'overview.js' %}"></script>
+
+{% endblock %}

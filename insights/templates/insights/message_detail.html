@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'dataTables.min.css' %}">
+{% endblock %}
+
+{% block content %}
+
+{{ current.content }}
+
+<table class="table" id="messageTable">
+    <thead>
+        <tr>
+            <th>Inhalt</th>
+            <th>Distanz</th>
+            <th>Datum</th>
+            <th>#</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for distance, message in rows %}
+            <tr>
+                <td>{{ message.content }}</td>
+                <td>{{ distance|floatformat:3 }}</td>
+                <td data-sort="{{ message.created_at|date:"c"}}">{{ message.created_at }}</td>
+                <td>
+                    <a href="{% url 'insights:message-detail' message.pk %}">
+                    {{ message.pk }}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script src="{% static 'jquery-3.7.1.slim.min.js' %}"></script>
+<script src="{% static 'dataTables.min.js' %}"></script>
+<script src="{% static 'message_detail.js' %}"></script>
+
+{% endblock %}

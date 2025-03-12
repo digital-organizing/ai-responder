@@ -13,6 +13,8 @@ from context.embeddings import (
 from context.models import Document, File, Collection
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -31,16 +33,22 @@ def _check_access(slug: str, user: User):
     return c
 
 
+@api_view()
 def query_context(request):
     q = request.GET.get("question")
     slug = request.GET.get("collection")
     limit = int(request.GET.get("n", 5))
+    collection = Collection.objects.get(slug=slug)
+
+    if collection.require_auth and not request.user.is_authenticated:
+        raise PermissionDenied()
+
     results = search(slug, q, limit)
     docs = get_documents(results)
 
     serializer = DocumentSerializer(docs, many=True)
 
-    return JsonResponse(serializer.data, safe=False)
+    return Response(serializer.data)
 
 
 def search_view(request):

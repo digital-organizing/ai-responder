@@ -5,7 +5,7 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 
 from crawler.crawling import crawl_page
-from crawler.models import CrawlConfig, Page
+from crawler.models import CrawlConfig, Page, Proxy
 from crawler.tasks import run_crawler
 
 
@@ -52,3 +52,9 @@ class PageAdmin(admin.ModelAdmin):
     def crawl_page(self, request, queryset):
         for page in queryset:
             crawl_page(page)
+
+
+@admin.register(Proxy)
+class ProxyAdmin(admin.ModelAdmin):
+    list_display = ["url"]
+    search_fields = ["url"]

@@ -53,10 +53,12 @@ INSTALLED_APPS = [
     "context",
     "chat",
     "crawler",
+    "insights",
     "django_celery_results",
     "django_celery_beat",
     "baton.autodiscover",
     "django_json_widget",
+    "rest_framework_api_key",
 ]
 
 MIDDLEWARE = [
@@ -249,6 +251,14 @@ BATON = {
         },
         {
             "type": "app",
+            "name": "authtoken",
+            "label": "API Tokens",
+            "icon": "fa fa-key",
+            "default_open": False,
+            "models": ({"name": "tokenproxy", "label": "Tokens"},),
+        },
+        {
+            "type": "app",
             "name": "chat",
             "label": "Chat",
             "icon": "fa fa-comments",
@@ -256,6 +266,7 @@ BATON = {
             "models": (
                 {"name": "chatbot", "label": "Bots"},
                 {"name": "thread", "label": "Threads"},
+                {"name": "message", "label": "Messages"},
             ),
         },
         {

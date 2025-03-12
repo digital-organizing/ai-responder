@@ -10,6 +10,7 @@ from django.contrib.auth.admin import UserAdmin, GroupAdmin
 
 from django.contrib.auth.models import User, Group
 
+from chat.message import store_question
 from chat.models import ChatBot, Field, Message, Thread
 
 
@@ -65,7 +66,32 @@ class ThreadAdmin(admin.ModelAdmin):
         return form
 
 
-# Custom users
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(thread__bot__group__in=request.user.groups.all())
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if not request.user.is_superuser:
+            form.base_fields["thread"].queryset = form.base_fields[
+                "thread"
+            ].queryset.filter(bot__group__in=request.user.groups.all())
+        return form
+
+    list_display = ["content", "role", "created_at", "thread_id"]
+    list_filter = ["role", "thread__bot"]
+    date_hierarchy = "created_at"
+
+    actions = ["index_questions"]
+
+    def index_questions(self, request, queryset):
+        for message in queryset.filter(role="user"):
+            store_question(message, message.thread.bot)
 
 
 class CustomUserAdmin(UserAdmin):

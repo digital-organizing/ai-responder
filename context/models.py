@@ -13,6 +13,8 @@ class Collection(models.Model):
 
     use_openai = models.BooleanField(default=True)
 
+    require_auth = models.BooleanField(default=False)
+
     def __str__(self) -> str:
         return self.slug
 

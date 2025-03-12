@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+    <h1>Thread</h1>
+<table id="threadTable">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Inhalt</th>
+            <th>Rolle</th>
+            <th>Datum</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for message in thread.message_set.all %}
+            <tr>
+                <td>{{message.pk}}</td>
+                <td>{{ message.content }}</td>
+                <td>{{message.role}}</td>
+                <td data-sort="{{ message.created_at|date:"c" }}">{{message.created_at}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script src="{% static 'jquery-3.7.1.slim.min.js' %}"></script>
+<script src="{% static 'dataTables.min.js' %}"></script>
+<script src="{% static 'thread_detail.js' %}"></script>
+{% endblock %}
