@@ -191,6 +191,7 @@ def stats_view(request):
         )
     else:
         raise ValueError("Invalid group_by value")
+    messages = messages.order_by("range_start")
     total_messages = messages.aggregate(total=Count("id"))["total"]
     units = {
         "day": "Tag",
