@@ -38,6 +38,7 @@ def overview(request):
 
     context["page"] = paginator.paginate_queryset(messages, Request(request))
     context["pager"] = paginator
+    context["title"] = "Nachrichten"
 
     return render(request, "insights/overview.html", context)
 
@@ -60,6 +61,7 @@ def threads_view(request):
 
     context["page"] = paginator.paginate_queryset(threads, Request(request))
     context["pager"] = paginator
+    context["title"] = "Threads"
 
     return render(request, "insights/threads.html", context)
 
@@ -75,6 +77,7 @@ def thread_detail(request, pk):
     if thread.bot not in available_bots:
         raise PermissionError("You do not have access to this thread.")
     context["thread"] = thread
+    context["title"] = "Thread"
     return render(request, "insights/thread_detail.html", context)
 
 
@@ -98,12 +101,13 @@ def message_detail(request, pk):
         {
             "rows": messages,
             "current": message,
+            "title": "Nachricht",
         },
     )
     
 @login_required
 def entry_view(request):
-    return render(request, "insights/entry.html")
+    return render(request, "insights/entry.html", {'title': 'Insights'})
 
 
 @login_required
@@ -111,12 +115,12 @@ def stats_view(request):
 
     if not request.GET:
         form = StatsForm(user=request.user)
-        return render(request, "insights/stats.html", {"form": form})
+        return render(request, "insights/stats.html", {"form": form, "title": "Statistiken"})
 
     form = StatsForm(request.GET, user=request.user)
 
     if not form.is_valid():
-        return render(request, "insights/stats.html", {"form": form})
+        return render(request, "insights/stats.html", {"form": form , "title": "Statistiken"})
 
     bots = form.cleaned_data["bots"]
     start_date = form.cleaned_data["start_date"]
@@ -187,7 +191,6 @@ def stats_view(request):
         )
     else:
         raise ValueError("Invalid group_by value")
-    print(messages)
     total_messages = messages.aggregate(total=Count("id"))["total"]
     units = {
         "day": "Tag",
@@ -203,5 +206,6 @@ def stats_view(request):
             "messages": messages,
             "total_messages": total_messages,
             "unit": units[group_by],
+            "title": "Statistiken",
         },
     )
