@@ -44,8 +44,8 @@
 <a class="button {% if not next_link %} disabled {% endif %}" href="{{ next_link|default:'#' }}">Ältere</a>
 {% endif %}
 {% endwith %}
-<a href="{% url 'insights:export' %}">Excel herunterladen</a>
 
+<a class="button" href="{% url 'insights:export' %}">Excel herunterladen</a>
 </nav>
 
 <script src="{% static 'jquery-3.7.1.slim.min.js' %}"></script>
