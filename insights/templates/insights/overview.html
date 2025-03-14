@@ -36,6 +36,15 @@
        {% endfor %}
     </tbody>
 </table>
+<nav class="pages">
+{% with next_link=pager.get_next_link previous_link=pager.get_previous_link %}
+{% if next_link or previous_link %}
+<a class="button {% if not previous_link %} disabled {% endif %}" href="{% if previous_link %}{% url 'insights:overview' %}{% else %}#{% endif %}">Neuste</a>
+<a class="button {% if not previous_link %} disabled {% endif %}" href="{{ previous_link|default:'#' }}">Neuere</a>
+<a class="button {% if not next_link %} disabled {% endif %}" href="{{ next_link|default:'#' }}">Ältere</a>
+{% endif %}
+{% endwith %}
+</nav>
 
 <script src="{% static 'jquery-3.7.1.slim.min.js' %}"></script>
 <script src="{% static 'dataTables.min.js' %}"></script>

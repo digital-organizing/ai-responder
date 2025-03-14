@@ -128,6 +128,11 @@ def stats_view(request):
     group_by = form.cleaned_data["group_by"]
 
     messages = Message.objects.filter(thread__bot__in=bots, role="user")
+    if start_date:
+        messages = messages.filter(created_at__gte=start_date)
+    if end_date:
+        messages = messages.filter(created_at__lte=end_date)
+
     if group_by == "day":
         messages = (
             messages.annotate(
