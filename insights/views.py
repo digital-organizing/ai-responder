@@ -1,4 +1,5 @@
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
+import pandas as pd
 from django.db.models import F, Count, Func
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth, TruncYear
 from django.db.models import Count
@@ -41,6 +42,26 @@ def overview(request):
     context["title"] = "Nachrichten"
 
     return render(request, "insights/overview.html", context)
+
+@login_required
+def export_messages(request):
+    """Export messages as xlsx"""
+    if request.user.is_superuser:
+        available_bots = ChatBot.objects.all()
+    else:
+        available_bots = ChatBot.objects.filter(group__in=request.user.groups.all())
+
+    messages = Message.objects.filter(
+        thread__bot__in=available_bots, role="user"
+    ).order_by("-created_at")[:50_000].select_related("thread__bot").values_list("created_at", "content", "thread__bot__name")
+    
+    df = pd.DataFrame(messages, columns=["created_at", "content", "bot"])
+    df["created_at"] = df["created_at"].dt.tz_localize(None) 
+    
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=messages.xlsx'
+    df.to_excel(response, index=False)
+    return response
 
 
 @login_required
@@ -215,3 +236,4 @@ def stats_view(request):
             "title": "Statistiken",
         },
     )
+
