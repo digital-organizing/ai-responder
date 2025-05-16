@@ -50,6 +50,8 @@ dependencies = [
   "whitenoise[brotli]",
   "sentry-sdk[django]",
   "djangorestframework-api-key",
+  "docling",
+  "docling-core[chunking-openai]",
 ]
 
 [build-system]

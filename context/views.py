@@ -1,4 +1,19 @@
 # Create your views here.
+import os
+import tempfile
+from docling.document_converter import DocumentConverter
+from docling.datamodel.base_models import InputFormat
+from docling.document_converter import DocumentConverter, PdfFormatOption
+from docling.datamodel.pipeline_options import PdfPipelineOptions, TableFormerMode
+
+import tiktoken
+
+from docling.chunking import HybridChunker
+from docling_core.transforms.chunker.tokenizer.openai import OpenAITokenizer
+from io import BytesIO
+from docling.backend.html_backend import HTMLDocumentBackend
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.document import InputDocument
 from bs4 import BeautifulSoup
 from tika import parser
 from hashlib import sha1
@@ -116,30 +131,41 @@ def upload_file(request, slug):
         content=request.FILES["content"],
         collection=collection,
     )
-
-    parsed = parser.from_buffer(f.content.open().read(), xmlContent=True)
-
-    text = parsed["content"]
-    doc = BeautifulSoup(text, "lxml")
-    if f.content.name.endswith(".pdf"):
-        pages = doc.find_all("div", {"class": "page"})
-        paragraphs = [p.get_text() for p in pages]
-    else:
-        paragraphs = [p.get_text() for p in doc.find_all("p")]
-
-    paragraphs = list(filter(lambda x: len(x.strip()) > 100, paragraphs))
     title = request.POST["name"]
+
+
+    pipeline_options = PdfPipelineOptions(do_table_structure=False)
+    pipeline_options.table_structure_options.mode = TableFormerMode.FAST  # use more accurate TableFormer model
+
+    converter = DocumentConverter(
+        format_options={
+                InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+            }
+    )
+
+    result = converter.convert(f.content.path)
+    
+    tokenizer = OpenAITokenizer(
+        tokenizer=tiktoken.encoding_for_model("gpt-4o"),
+        max_tokens=5*1024,
+    )
+    chunker = HybridChunker(
+        tokenizer=tokenizer,
+        merge_peers=True
+    )
+
+    docs = list(chunker.chunk(result.document))
 
     documents = [
         Document(
-            content=paragraph,
+            content=paragraph.text,
             title=title,
             number=i,
             collection=collection,
             file=f,
-            content_hash=get_hash(paragraph),
+            content_hash=get_hash(paragraph.text),
         )
-        for i, paragraph in enumerate(paragraphs)
+        for i, paragraph in enumerate(docs)
     ]
 
     documents = Document.objects.bulk_create(documents)

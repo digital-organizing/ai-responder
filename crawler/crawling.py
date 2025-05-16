@@ -1,4 +1,8 @@
 import time
+from docling.document_converter import DocumentConverter
+from docling.datamodel.base_models import InputFormat
+from docling.document_converter import DocumentConverter, PdfFormatOption
+from docling.datamodel.pipeline_options import PdfPipelineOptions, TableFormerMode
 from selenium.webdriver.common.proxy import Proxy as SeleniumProxy, ProxyType
 
 from django.utils.timezone import make_aware, is_aware
@@ -18,6 +22,14 @@ from django.db.models import Q
 from django.utils import timezone
 from selenium import webdriver
 from tika import parser
+import tiktoken
+
+from docling.chunking import HybridChunker
+from docling_core.transforms.chunker.tokenizer.openai import OpenAITokenizer
+from io import BytesIO
+from docling.backend.html_backend import HTMLDocumentBackend
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.document import InputDocument
 
 from context.models import Document
 from crawler.models import CrawlConfig, Page
@@ -99,7 +111,8 @@ def crawl_page_requests(page: Page, config: CrawlConfig):
             title, content = fetch_url_requests(page.url, session)
             print("Fetched: " + title)
             _create_doc(title, content, page, config)
-        except:
+        except Exception as ex:
+            traceback.print_exc()
             print("Fetched: ")
             pass
 
@@ -151,23 +164,46 @@ def get_published_date(soup) -> Optional[datetime]:
     # If no date is found, return None
     return None
 
+def create_chunks(content: str, chunker: HybridChunker):
+    in_doc = InputDocument(
+        path_or_stream=BytesIO(content.encode()),
+        format=InputFormat.HTML,
+        backend=HTMLDocumentBackend,
+        filename="duck.html",
+    )
+    backend = HTMLDocumentBackend(in_doc=in_doc, path_or_stream=BytesIO(content.encode()))
+    dl_doc = backend.convert()
 
-def _create_doc(title, content, page, config):
-    print("Creating docs")
-    soup = BeautifulSoup(content, "lxml")
+    chunks = list(chunker.chunk(dl_doc=dl_doc))
+    
+    return chunks
+    
 
-    docs = []
+def _create_doc(title, content, page, config, chunker=None):
+    print("Create docs")
+    if chunker is None:
+        tokenizer = OpenAITokenizer(
+            tokenizer=tiktoken.encoding_for_model("gpt-4o"),
+            max_tokens=5*1024,
+        )
+        chunker = HybridChunker(
+            tokenizer=tokenizer,
+            merge_peers=True
+        )
+        print("Loaded chunker")
+        return _create_doc(title, content, page, config, chunker)
+    
+    print("Called with chunker")
 
-    for paragraph in soup.find_all("p"):
-        docs.append(paragraph.get_text())
+    docs = create_chunks(content, chunker)
+    print(docs)
 
     page.document_set.all().update(stale=True)
 
-    for i, d in enumerate(docs):
-        if len(d) < 100 or len(d) > 2000:
-            continue
-
+    for i, doc in enumerate(docs):
         sha = sha1()
+        d = doc.text
+        
         sha.update(d.encode())
         hash = sha.hexdigest()
 
@@ -197,11 +233,10 @@ def _create_doc(title, content, page, config):
     )
 
     page.last_fetched = timezone.now()
-    published_at = get_published_date(soup)
+    published_at = None
 
     if published_at and not is_aware(published_at):
         published_at = make_aware(published_at)
-    print(published_at)
     page.published_at = published_at
     page.save()
 
@@ -290,21 +325,20 @@ def fetch_url(url: str, c: CrawlConfig, driver: Optional[webdriver.Remote] = Non
 
 
 def fetch_url_requests(url: str, session: requests.Session):
-    print("Fetch")
+
+    if url.endswith(".pdf") or url.endswith(".docx"):
+        pipeline_options = PdfPipelineOptions(do_table_structure=False)
+        pipeline_options.table_structure_options.mode = TableFormerMode.FAST  # use more accurate TableFormer model
+        converter = DocumentConverter(
+            format_options={
+                    InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+                }
+        )
+
+        result = converter.convert(url)
+        return result.document.name, result.document.export_to_html()
+
     response = session.get(url, timeout=10)
-    print("Fetched")
-
-    if url.endswith(".pdf"):
-        parsed = parser.from_buffer(response.content, xmlContent=True)
-        text = parsed["content"]
-        doc = BeautifulSoup(text, "lxml")
-        pages = doc.find_all("div", {"class": "page"})
-
-        paragraphs = ""
-        for page in pages:
-            paragraphs += "<p>" + page.get_text().replace("\n\n", "<br/>)") + "</p>"
-        title = doc.find("title")
-        return title if title else "", "<body>" + paragraphs + "</body>"
 
     content = response.text
     doc = BeautifulSoup(content, "lxml")
