@@ -34,6 +34,8 @@ class ChatBot(models.Model):
     base_url = models.CharField(blank=True, max_length=200)
 
     functions = models.JSONField(blank=True)
+    
+    context_limit = models.IntegerField(default=5)
 
     def __str__(self):
         return self.name

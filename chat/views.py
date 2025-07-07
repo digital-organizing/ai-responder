@@ -32,7 +32,7 @@ def answer_view(request: HttpRequest, slug):
 
     data.pop("csrfmiddlewaretoken", "")
     if bot.context_provider:
-        results = search(bot.context_provider.slug, q, limit=10)
+        results = search(bot.context_provider.slug, q, limit=bot.context_limit)
         docs = get_documents(results)
 
     answer, _ = generate_answer(q, bot, docs, **data)
