@@ -27,4 +27,4 @@ def get_documents(result):
     docs = [
         x for _, x in sorted(zip(scores, docs), key=lambda pair: pair[0], reverse=True)
     ]
-    return docs
+    return docs, scores

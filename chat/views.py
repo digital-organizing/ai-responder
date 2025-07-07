@@ -29,11 +29,12 @@ def answer_view(request: HttpRequest, slug):
 
     bot = ChatBot.objects.get(slug=slug)
     docs = []
+    scores = []
 
     data.pop("csrfmiddlewaretoken", "")
     if bot.context_provider:
         results = search(bot.context_provider.slug, q, limit=bot.context_limit)
-        docs = get_documents(results)
+        docs, scores = get_documents(results)
 
     answer, _ = generate_answer(q, bot, docs, **data)
 
@@ -57,10 +58,10 @@ def answer_view(request: HttpRequest, slug):
         tools=tools,
         role="assistant",
     )
-    serializer = DocumentSerializer(docs, many=True)
+    serializer = DocumentSerializer(docs, many=True, )
 
     return JsonResponse(
-        {"tools": tools, "answer": content.replace("ß", "ss"), "docs": serializer.data}
+        {"tools": tools, "answer": content.replace("ß", "ss"), "docs": serializer.data, "scores": scores}
     )
 
 
