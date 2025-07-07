@@ -116,7 +116,7 @@ def thread_init(request, slug):
 
     if bot.context_provider:
         results = search(bot.context_provider.slug, q, limit=10)
-        docs = get_documents(results)
+        docs, _ = get_documents(results)
 
     answer, messages = generate_answer(q, bot, docs, **data)
 
@@ -176,7 +176,7 @@ def thread_continue(request, slug):
 
     if bot.context_provider:
         results = search(bot.context_provider.slug, q, limit=10)
-        docs = get_documents(results)
+        docs, _ = get_documents(results)
 
     thread = Thread.objects.get(pk=data.pop("threadId"))
     messages = thread.messages()

@@ -59,7 +59,7 @@ def query_context(request):
         raise PermissionDenied()
 
     results = search(slug, q, limit)
-    docs = get_documents(results)
+    docs, _ = get_documents(results)
 
     serializer = DocumentSerializer(docs, many=True)
 
