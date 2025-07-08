@@ -42,14 +42,45 @@ class CollectionAdmin(admin.ModelAdmin):
         return form
 
 
+class HasTitleFilter(admin.SimpleListFilter):
+    title = "Titel"
+    parameter_name = "has_title"
+    
+    def lookups(self, request: HttpRequest, model_admin: Any) -> list[tuple[str, str]]:
+        return [
+            ("yes", "Mit Titel"),
+            ("no", "Ohne Titel"),
+        ]
+        
+    def queryset(self, request: HttpRequest, queryset: QuerySet[Document]) -> QuerySet[Document]:
+        if self.value() == "yes":
+            return queryset.filter(title__isnull=False).exclude(title="")
+        elif self.value() == "no":
+            return queryset.filter(title__isnull=True) | queryset.filter(title="")
+        return queryset
+
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
     list_display = ["title", "collection"]
 
-    actions = ["delete_documents_action"]
+    actions = ["delete_documents_action", 
+               "create_titles_action"]
 
     autocomplete_fields = ["page"]
+    
+    search_fields = ["title", "content"]
+    
+    list_filter = ["collection", "is_indexed", "stale", 
+                   HasTitleFilter, "fetched_at", "indexed_at"]
 
     @admin.action(description="Delete Documents")
     def delete_documents_action(self, request, queryset):
         delete_documents(queryset)
+
+
+    @admin.action(description="Create titles")
+    def create_titles_action(self, request, queryset):
+        from context.tasks import create_document_titles
+        pks = list(queryset.values_list("pk", flat=True))
+        
+        create_document_titles.delay(pks=pks)

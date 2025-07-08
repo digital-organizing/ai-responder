@@ -180,7 +180,6 @@ def create_chunks(content: str, chunker: HybridChunker):
     
 
 def _create_doc(title, content, page, config, chunker=None):
-    print("Create docs")
     if chunker is None:
         tokenizer = OpenAITokenizer(
             tokenizer=tiktoken.encoding_for_model("gpt-4o"),
