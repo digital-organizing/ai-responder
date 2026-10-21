@@ -6,7 +6,7 @@ dependencies = [
   "boto3",
   "cachetools",
   "celery[redis]",
-  "django",
+  "django<6",
   "django-bootstrap5",
   "django-celery-beat",
   "django-celery-results",
@@ -22,8 +22,6 @@ dependencies = [
   "document-embedding",
   "exceptiongroup",
   "gunicorn",
-  "fairseq",
-  "laser_encoders",
   "lxml",
   "markdown",
   "more-itertools",
@@ -77,7 +75,7 @@ dmypy = true
 
 [tool.mypy]
 plugins = ["mypy_django_plugin.main"]
-python_version = "3.10"
+python_version = "3.13"
 check_untyped_defs = true
 ignore_missing_imports = true
 warn_unused_ignores = true

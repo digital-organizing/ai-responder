@@ -1,14 +1,11 @@
 from contextlib import contextmanager
-from typing import List, TYPE_CHECKING
+from typing import List
 
 import numpy as np
 import openai
 from django.conf import settings
 from django.db.models import QuerySet
 from qdrant_client import QdrantClient, models
-
-if TYPE_CHECKING:
-    from laser_encoders import LaserEncoderPipeline
 
 from context.models import Collection, Document
 
@@ -23,20 +20,6 @@ def qdrant_client():
         client.close()
 
 
-def load_encoder(language):
-    from laser_encoders import LaserEncoderPipeline
-
-    encoder = LaserEncoderPipeline(language)
-    return encoder
-
-
-EMBEDDING_DIMENSION = 1024
-
-
-def generate_embeddings(texts: List[str], encoder):
-    return np.array(encoder.encode_sentences(texts, normalize_embeddings=True))
-
-
 def generate_embeddings_openai(texts: List[str]):
     client = openai.Client(api_key=settings.OPENAI_KEY)
     response = client.embeddings.create(input=texts, model="text-embedding-3-large")
@@ -46,12 +29,7 @@ def generate_embeddings_openai(texts: List[str]):
 
 
 def get_embedding(document: Document):
-    if document.collection.use_openai:
-        return generate_embeddings_openai([document.content])
-
-    return generate_embeddings(
-        [document.content], load_encoder(document.collection.language)
-    )
+    return generate_embeddings_openai([document.content])
 
 
 def batch_qs(qs, batch_size=1000):
@@ -81,14 +59,11 @@ def collection_exists(qdrant, slug):
     return slug in names(qdrant.get_collections())
 
 
-def _batch_insert(collection, query, encoder, use_openai):
+def _batch_insert(collection, query):
     records = list(query)
     print(f"Creating embeddings for {len(records)} texts")
 
-    if use_openai:
-        embeddings = generate_embeddings_openai([r[1] for r in records])
-    else:
-        embeddings = generate_embeddings([r[1] for r in records], encoder)
+    embeddings = generate_embeddings_openai([r[1] for r in records])
 
     embedding_dim = embeddings.shape[-1]
 
@@ -134,13 +109,8 @@ def update_document(doc: Document):
 
 
 def update_documents(docs: QuerySet[Document], collection: Collection):
-    if not collection.use_openai:
-        encoder = load_encoder(collection.language)
-    else:
-        encoder = None
-
     for batch in batch_qs(docs.values_list("pk", "content").order_by("pk")):
-        _batch_insert(collection, batch, encoder, collection.use_openai)
+        _batch_insert(collection, batch)
 
     docs.update(is_indexed=True)
 
