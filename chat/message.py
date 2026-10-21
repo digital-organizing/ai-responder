@@ -1,8 +1,6 @@
 from context.embeddings import (
     get_embedding,
-    load_encoder,
     qdrant_client,
-    generate_embeddings,
     generate_embeddings_openai,
     collection_exists,
 )
@@ -15,11 +13,6 @@ from qdrant_client.http.models import models
 def store_question(msg: Message, bot: ChatBot):
     store_name = bot.slug + "_questions"
 
-    if bot.context_provider:
-        use_openai = bot.context_provider.use_openai
-    else:
-        use_openai = True
-
     with qdrant_client() as client:
         if (
             collection_exists(client, store_name)
@@ -27,13 +20,7 @@ def store_question(msg: Message, bot: ChatBot):
         ):
             return
 
-        if use_openai:
-            embeddings = generate_embeddings_openai([msg.content])
-        else:
-            assert bot.context_provider is not None
-            embeddings = generate_embeddings(
-                [msg.content], load_encoder(bot.context_provider.language)
-            )
+        embeddings = generate_embeddings_openai([msg.content])
 
         embedding_dim = embeddings.shape[-1]
 

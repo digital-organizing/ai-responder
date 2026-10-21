@@ -1,7 +1,5 @@
 from context.embeddings import (
-    generate_embeddings,
     generate_embeddings_openai,
-    load_encoder,
     qdrant_client,
 )
 from context.models import Collection, Document
@@ -9,10 +7,7 @@ from context.models import Collection, Document
 
 def search(slug, query, limit=5):
     collection = Collection.objects.get(slug=slug)
-    if collection.use_openai:
-        embedding = generate_embeddings_openai([query])
-    else:
-        embedding = generate_embeddings([query], load_encoder(collection.language))
+    embedding = generate_embeddings_openai([query])
 
     with qdrant_client() as client:
         result = client.search(collection.slug, embedding[0], limit=limit)

@@ -1,5 +1,5 @@
 # pull official base image
-FROM python:3.10-slim
+FROM python:3.13-slim
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -7,13 +7,13 @@ ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && \
   apt-get install -y \
-  netcat-traditional gettext build-essential gcc git
+  netcat-traditional gettext
 
 # install dependencies
 
 RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu && pip install --no-cache --upgrade pip
 COPY ./pyproject.toml .
-RUN --mount=type=cache,target=/root/.cache pip install "pip<24.1" && pip install .
+RUN --mount=type=cache,target=/root/.cache pip install .
 
 RUN useradd -ms /bin/bash app
 # create the appropriate directories
