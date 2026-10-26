@@ -79,3 +79,48 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # Asks the organisation's app platform for the deploy: the job joins the
+  # tailnet and logs in to the app host through Tailscale SSH, so this
+  # repository holds no SSH key. It hands over no compose file: the stack is in
+  # the infra repository (apps/ai-responder.compose.yml). With id-token the
+  # job proves to the app host which repository it runs in.
+  #
+  # These are the steps of the shared workflow
+  # digital-organizing/infra/.github/workflows/deploy.yml, copied here: that
+  # repository is private and this one is public, and a public repository
+  # cannot call a workflow of a private one. Keep the two the same.
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      id-token: write
+    concurrency:
+      group: deploy-ai-responder-prod
+      cancel-in-progress: false
+    steps:
+      - name: Join the tailnet as a CI node
+        uses: tailscale/github-action@6cae46e2d796f265265cfcf628b72a32b4d7cade # v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci-ai-collab
+
+      - name: Deploy
+        env:
+          APP: ai-responder-prod
+          HOST: app-ai-collab
+          REGISTRY_TOKEN: ${{ github.token }}
+        run: |
+          address=$(tailscale ip -4 "$HOST")
+          run() { ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 "deploy@$address" "$@"; }
+          # GitHub's word for which repository this job runs in, good for this
+          # host only; the app host deploys an app from its own repository only.
+          oidc=$(curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=app-deploy:$HOST" | jq -r .value)
+          echo "::add-mask::$oidc"
+          # The job's own token, which only lives as long as this run, lets the
+          # server pull the private image.
+          { echo "oidc $oidc"; echo "registry $REGISTRY_TOKEN"; } | run "deploy $APP"
