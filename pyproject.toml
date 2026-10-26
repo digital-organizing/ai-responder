@@ -44,7 +44,9 @@ dependencies = [
   "tika",
   "uvicorn[standard]",
   "w3lib",
-  "qdrant-client",
+  # The server (qdrant, 1.7.4) has no Query API, and 1.16 removed search()
+  # and upload_records(); 1.15 still speaks to it.
+  "qdrant-client>=1.15,<1.16",
   "whitenoise[brotli]",
   "sentry-sdk[django]",
   "djangorestframework-api-key",
