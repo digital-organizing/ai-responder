@@ -31,9 +31,9 @@ def store_question(msg: Message, bot: ChatBot):
                     size=embedding_dim, distance=models.Distance.COSINE
                 ),
             )
-        client.upload_points(
+        client.upload_records(
             collection_name=store_name,
-            points=[models.PointStruct(id=msg.pk, vector=embeddings[0])],
+            records=[models.Record(id=msg.pk, vector=embeddings[0])],
         )
         print("Stored point", msg.pk)
 
@@ -46,9 +46,7 @@ def retrieve_questions(msg: Message, bot: ChatBot, n=50, offset=0):
             collection_name=store_name, ids=[msg.pk], with_vectors=True
         )[0].vector
         assert vector is not None
-        msgs = client.query_points(
-            store_name, query=vector, limit=n, offset=offset, with_payload=False
-        ).points
+        msgs = client.search(store_name, vector, limit=n, offset=offset)
 
     pks = [r.id for r in msgs]
     scores = [r.score for r in msgs]
