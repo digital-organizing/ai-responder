@@ -37,6 +37,14 @@ class ChatBot(models.Model):
     
     context_limit = models.IntegerField(default=5)
 
+    disable_reasoning_with_tools = models.BooleanField(
+        default=True,
+        help_text=(
+            "Send reasoning_effort='none' when tools are used. Newer OpenAI models "
+            "(GPT-5.4+) reject tools combined with reasoning on /v1/chat/completions."
+        ),
+    )
+
     def __str__(self):
         return self.name
     

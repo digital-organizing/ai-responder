@@ -56,6 +56,8 @@ def get_completion(messages, bot, use_functions=False, **kwargs):
 
     if "tool_choice" in kwargs and kwargs["tool_choice"] != "none":
         tools = bot.functions
+        if bot.disable_reasoning_with_tools:
+            kwargs.setdefault("reasoning_effort", "none")
     else:
         tools = None
         
