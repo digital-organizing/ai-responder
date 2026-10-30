@@ -2,9 +2,11 @@
 import json
 
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import BadRequest
 from django.http import HttpRequest, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from langdetect import detect
 
 from chat.completion import generate_answer
@@ -21,13 +23,22 @@ def index_view(request: HttpRequest):
     return render(request, "index.html")
 
 
+def pop_question(data: dict) -> str:
+    # Scanners hit any path that matches <slug>/ without a question; answer
+    # them with 400 instead of a KeyError (500).
+    if "question" not in data:
+        raise BadRequest("Missing question")
+    return str(data.pop("question"))
+
+
 @csrf_exempt
+@require_POST
 def answer_view(request: HttpRequest, slug):
 
     data = request.POST.dict()
-    q = str(data.pop("question"))[-10_000:]
+    q = pop_question(data)[-10_000:]
 
-    bot = ChatBot.objects.get(slug=slug)
+    bot = get_object_or_404(ChatBot, slug=slug)
     docs = []
     scores = []
 
@@ -77,14 +88,14 @@ def form_view(request):
 @login_required
 def field_view(request, slug):
     return render(
-        request, "chat/bot_form.html", {"bot": ChatBot.objects.get(slug=slug)}
+        request, "chat/bot_form.html", {"bot": get_object_or_404(ChatBot, slug=slug)}
     )
 
 
 @csrf_exempt
 def determine_language(request):
     data = request.POST.dict()
-    q = str(data.pop("question"))
+    q = pop_question(data)
 
     return JsonResponse({"lang": detect(q)})
 
@@ -97,7 +108,7 @@ def manage_view(request):
 
 @login_required
 def manage_chatbot(request, slug):
-    bot = ChatBot.objects.get(slug=slug)
+    bot = get_object_or_404(ChatBot, slug=slug)
     if not bot.group in request.user.groups.all():
         raise PermissionError("You are not allowed to manage this bot")
 
@@ -105,11 +116,12 @@ def manage_chatbot(request, slug):
 
 
 @csrf_exempt
+@require_POST
 def thread_init(request, slug):
     data = request.POST.dict()
-    q = str(data.pop("question"))[-10_000:]
+    q = pop_question(data)[-10_000:]
 
-    bot = ChatBot.objects.get(slug=slug)
+    bot = get_object_or_404(ChatBot, slug=slug)
     docs = []
 
     data.pop("csrfmiddlewaretoken", "")
@@ -169,9 +181,9 @@ def thread_continue(request, slug):
 
     data.pop("csrfmiddlewaretoken", "")
 
-    q = str(data.pop("question"))[-10_000:]
+    q = pop_question(data)[-10_000:]
 
-    bot = ChatBot.objects.get(slug=slug)
+    bot = get_object_or_404(ChatBot, slug=slug)
     docs = []
 
     if bot.context_provider:
